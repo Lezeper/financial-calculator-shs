@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base href="/">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/prism.css">
+    <link rel="stylesheet" href="css/style.css"/>
+
+    <script src="js/jquery-1.12.3.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+    <script src="js/angular-animate.min.js"></script>
+    <script src="js/angular-sanitize.min.js"></script>
+    <script src="js/angular-touch.min.js"></script>
+    <script src="js/angular-ui-router.min.js"></script>
+    <script src="js/prism.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="app.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <navigation ng-controller="navCtrl"></navigation>
+    <div class="row" style="padding: 20px">
+        <div ng-view></div>
+    </div>
+
+    <hr>
+    <footer ng-controller="footerCtrl" class="text-center row">
+        <title>{{settings.web_title}}</title>
+        <i class="fa fa-copyright" aria-hidden="true"></i> {{year}} - Lewis
+    </footer>
+</div>
+</body>
+
+</html>

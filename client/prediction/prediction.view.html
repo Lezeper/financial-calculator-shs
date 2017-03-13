@@ -1,0 +1,179 @@
+<div class="alert alert-danger" ng-repeat="fdd in Prediction.financeDangerDate">
+  <strong>Warning!</strong> Finance Crisis on {{fdd}}!
+</div>
+<div class="page-header">
+	<h3 class="text-center">Statement Prediction</h3>
+</div>
+<div class="row">
+	<!--Left Section-->
+	<div class="col-md-6 col-sm-6 col-xs-6">
+		<form name="predForm" class="form-horizontal col-md-6 col-md-offset-3" novalidate>
+			<div class="form-group">
+				<label for="start-date">Start Date (option)</label>
+				<input type="date" id="start-date" ng-model="Prediction.startDate" class="form-control">
+			</div>
+			<div class="form-group">
+				<label for="end-date" class="required-label">End Date</label>
+				<input type="date" id="end-date" ng-model="Prediction.endDate" class="form-control" required>
+			</div>
+			<div class="form-group">
+				<button class="btn btn-primary" type="button" ng-disabled="predForm.$invalid"
+					ng-click="Prediction.doPredict(Prediction.startDate, Prediction.endDate)">Generate Predicted Report
+				</button>
+				<!--<button class="btn btn-info" ng-click="addTransactions(startDate, endDate)">Add</button>-->
+			</div>
+		</form>
+	</div>
+	<!--Left Section End-->
+	<!--Right Section-->
+	<div class="col-md-6 col-sm-6 col-xs-6" style="width: auto" ng-if="Prediction.statements.length > 0">
+		<!--text-muted means the date is no this month-->
+		<div uib-datepicker ng-model="Prediction.selectedDate" class="well" datepicker-options="Prediction.calendarDisplayerOptions"
+			ng-change="Prediction.dateSelected(Prediction.selectedDate)"></div>
+		<div ng-if="Prediction.statements.length > 0" class="text-right">
+			<button class="btn btn-success" type="button" ng-if="!Prediction.showStatements" 
+				ng-click="Prediction.showStatements=true">Show Statements</button>
+			<button class="btn btn-warning" type="button" ng-if="Prediction.showStatements"
+					ng-click="Prediction.showStatements=false">Hide Statements</button>
+		</div>
+	</div>
+	<!--Right Section End-->
+</div>
+<!--Do some Change--
+<div class="page-header">
+	<h3 class="text-center">Some Changes</h3>
+</div>
+<div>
+	<!--<button class="btn btn-primary" type="button" ng-click="addTransactions(startDate, endDate)">Add Transactions</button>--
+	<h3><small>Deleted Transaction</small></h3>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Description</th>
+				<th>Type</th>
+				<th>Amount</th>
+				<th>Account</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td>
+					<button class="btn-link">
+						<i class="glyphicon glyphicon glyphicon-remove"></i>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div>
+		<button class="btn btn-primary" type="button">Generate New Predicted Report</button>
+	</div>
+</div>
+<!--Do some Change End-->
+<!--Statements Begin-->
+<div ng-if="Prediction.statements.length > 0 && Prediction.showStatements">
+	<div class="page-header">
+		<h3 class="text-center">Predicted Statements</h3>
+	</div>
+	<div class="panel panel-primary" ng-repeat="st in Prediction.statements" ng-init="st.lastBalanceSum=0; st.avaliableBalanceSum=0">
+		<div class="panel-heading">
+			<strong ng-bind="st.date"></strong>
+		</div>
+		<ul class="list-group">
+			<li class="list-group-item">
+				<div class="page-header">
+					<h3 class="text-center">
+						Account Details
+					</h3>
+				</div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Account</th>
+							<th>Type</th>
+							<th>Pending</th>
+							<th>Balance(Usage)</th>
+							<th>Last Balance</th>
+							<th>Avaliable Balance</th>
+							<th>Rewards</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="account in st.accountsDetails">
+							<td><button class="btn-link" ng-click="">{{ account.accountName }}</button></td>
+							<td>{{ account.type }}</td>
+							<td ng-init="Prediction.calculatePending(account)">{{account.pending | currency: "$": 2}}</td>
+							<td ng-class="account.balance < 0 ? 'btn-danger' : null">
+								{{ account.balance | currency: "$": 2 }}
+								<span ng-if="account.creditLine" ng-class="account.balance/account.creditLine*100 >= 100 ? 'btn-danger' : null">
+									({{account.balance/account.creditLine*100 | number: 0}}%)
+								</span>
+								<span ng-if="account.changed"
+									ng-class="((account.changed > 0 && account.type==='CreditCard') 
+										|| (account.changed < 0 && account.type!=='CreditCard')) 
+										? 'finance-warning' : 'finance-safe'">
+									({{ account.changed | currency: "$": 2 }})
+								</span>
+							</td>
+							<td ng-init="st.lastBalanceSum=(st.lastBalanceSum+account.lastBalance)">{{ account.lastBalance | currency: "$": 2 }}</td>
+							<!-- AB: Avaliable Balance means suppose you will pay off the last balance, the rest of money you can leave there below the threshold -->
+							<td ng-if="account.type === 'CreditCard'" 
+									ng-init="st.avaliableBalanceSum=(st.avaliableBalanceSum+(account.creditLine * (account.threshold / 100) - account.balance + account.lastBalance))">
+								{{ account.creditLine * (account.threshold / 100) - account.balance + account.lastBalance | currency: "$": 2 }} ({{ account.threshold }}%)
+							</td>
+							<td ng-if="account.type !== 'CreditCard'" ng-init="st.avaliableBalanceSum=(st.avaliableBalanceSum + (account.balance * (account.threshold / 100)))">
+								{{ account.balance * (account.threshold / 100) | currency: "$": 2 }} ({{ account.threshold }}%)
+							</td>
+							<td>
+								<span ng-if="account.rewardRules[0].rule.rewardType === 'Cash'">{{account.rewards | currency: "$": 2}}</span>
+								<span ng-if="account.rewardRules[0].rule.rewardType === 'Point'">{{account.rewards | number: 0}}</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</li>
+			<li class="list-group-item text-right">
+				<strong>Total Last Balance: {{ st.lastBalanceSum | currency: "$": 2 }}</strong><br>
+				<strong>Total Avaliable Balance Now: {{ st.avaliableBalanceSum | currency: "$": 2 }}</strong>
+			</li>
+			<li class="list-group-item">
+				<div class="page-header">
+					<h3 class="text-center">
+						Transactions
+					</h3>
+				</div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Description</th>
+							<th>Type</th>
+							<th>Amount</th>
+							<th>Account</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="transaction in st.transactions track by $index">
+							<td>{{ transaction.description }}</td>
+							<td>{{ transaction.type }}</td>
+							<td>{{ transaction.amount | currency: "$": 2 }}</td>
+							<td><button class="btn-link" style="padding-left: 0" ng-click="">{{ transaction.payBy.accountName }}</button></td>
+							<td>
+								<!--<button class="btn-link"><i class="glyphicon glyphicon-pencil"></i></button>
+								<button class="btn-link" ng-click="deleteTransaction($parent.$index, $index, startDate, endDate)">
+									<i class="glyphicon glyphicon glyphicon-remove"></i>
+								</button>-->
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</li>
+		</ul>
+	</div>
+</div>
+<!--Statements End-->

@@ -1,0 +1,99 @@
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+textarea {
+	resize: vertical;
+}
+
+body {
+  padding: 50px 0;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.container {
+}
+
+a {
+  color: #00B7FF;
+}
+
+.font-center {
+	text-align: center;
+}
+
+.font-center-bold{
+	text-align: center;
+	font-weight: bold;
+}
+
+.account-thumbnail {
+	width: 84.7px;
+	height: 53.2px;
+}
+
+.button-margin-right {
+	margin-right: 5px;
+}
+
+.medium-form-center {
+	margin: auto;
+	max-width: 500px;
+}
+
+.plus-symbol {
+	cursor: pointer;
+	color: red;
+	margin-left: 5px;
+}
+
+.finance-warning {
+	color: red;
+}
+
+.finance-safe {
+	color: green;
+}
+
+.cal-finance-safe button {
+	background-color: #337ab7;
+	color: white;
+}
+
+.cal-finance-warning button {
+	background-color: red;
+	color: white;
+}
+
+.required-label:before {
+	color: red;
+	padding-right: 3px;
+	content: "*";
+}
+
+.btn-danger span {
+	color: black;
+}
+
+.cursor-hand {
+	cursor: pointer;
+}
+
+.div-scrollable {
+	overflow-y: scroll;
+	height: 400px;
+}
+
+/*@media only screen and (max-device-width: 480px) {
+	body {
+		min-width: 1080px;
+	}
+	div.container {
+		margin: 0;
+		width: 100%;
+		padding: 0;
+	}
+	p pre {
+		font-size: 11px;
+	}
+}*/

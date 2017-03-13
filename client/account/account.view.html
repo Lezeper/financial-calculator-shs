@@ -1,0 +1,60 @@
+<!--Account-->
+<div class="page-header">
+  <h3>Account Summery
+	  <small><i class="glyphicon glyphicon-plus plus-symbol" ng-click="Account.showAccountModal('Add Account')" ></i></small>
+		<br>
+		<small>updated by {{Account.accountUpdatedDate | date}}</small>
+  </h3>
+</div>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Updated</th>
+			<th>Due Date</th>
+			<th>Closing Date</th>
+			<th>Last Balance</th>
+			<th>Balance</th>
+			<th>PTs</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="account in Account.accounts">
+			<td class="cursor-hand" ng-click="Account.showAccountModal(account.accountName, account)"><img src="./img/{{account.accountName}}.png" 
+				class="account-thumbnail" alt="{{account.accountName}}" title="{{account.accountName}}"></td>
+			<td>{{account.updatedDate | date:'MM/dd'}}</td>
+			<td>{{account.dueDate | date:'MM/dd'}}</td>
+			<td>{{account.closingDate | date:'MM/dd'}}</td>
+			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('lastBalance', account.lastBalance, account)">{{account.lastBalance | currency: "$": 2}}</td>
+			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('balance', account.balance, account)">{{account.balance | currency: "$": 2}}</td>
+			<td class="cursor-hand">{{account.pendingTransactions.length}}</td>
+			<td>
+				<button class="btn-link"><i class="glyphicon glyphicon glyphicon-remove"
+							ng-click="Account.removeAccount(account._id)"></i></button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<!--Account End-->
+<!--Posted Statement--
+<div class="page-header">
+  <h3>Posted Statement
+		<small>updated by {{Account.accountUpdatedDate | date}}</small>
+  </h3>
+</div>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Date</th>
+			<th>File</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td></td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
+<!--Posted Statement End-->

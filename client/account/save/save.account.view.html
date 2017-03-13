@@ -1,0 +1,227 @@
+<div class="page-header">
+    <h3 class="text-center">{{SaveAccount.saveAccountPageTitle}}</h3>
+</div>
+<div class="medium-form-center">
+    <form class="form-horizontal">
+        <div class="form-group" ng-if="!SaveAccount.account">
+            <label class="control-label col-sm-2">Account Name</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <select class="form-control" ng-model="SaveAccount.nAccount.accountName"
+                        ng-disabled="SaveAccount.saveAccountFlag.accountName" ng-change="SaveAccount.selectedAccountDefault()">
+                        <option ng-repeat="ad in SaveAccount.accountDefault">{{ad.accountName}}</option>
+                    </select>
+                    <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.accountName=!SaveAccount.saveAccountFlag.accountName">
+                        <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.accountName"></i>
+                        <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.accountName"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div ng-if="SaveAccount.account.type === 'CreditCard' || SaveAccount.nAccount.type === 'CreditCard'">
+            <div class="form-group">
+                <label class="control-label col-sm-2">Due Date</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input type="date" date-input class="form-control" ng-model="SaveAccount.nAccount.dueDate"
+                            ng-readonly="SaveAccount.saveAccountFlag.dueDate">
+                        <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.dueDate=!SaveAccount.saveAccountFlag.dueDate">
+                            <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.dueDate"></i>
+                            <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.dueDate"></i>
+                        </span>
+                    </div>         
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Closing Date</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input type="date" date-input  class="form-control" ng-model="SaveAccount.nAccount.closingDate"
+                            ng-readonly="SaveAccount.saveAccountFlag.closingDate">
+                        <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.closingDate=!SaveAccount.saveAccountFlag.closingDate">
+                            <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.closingDate"></i>
+                            <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.closingDate"></i>
+                        </span>  
+                    </div>              
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Minimum Payment</label>
+                <div class="col-sm-10">
+                    <input-amount ng-model="SaveAccount.nAccount.minPayment"
+                        data="SaveAccount.nAccount.minPayment" data-readonly="SaveAccount.saveAccountFlag.minPayment"></input-amount>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Credit Line</label>
+                <div class="col-sm-10">
+                    <input-amount ng-model="SaveAccount.nAccount.creditLine"
+                        data="SaveAccount.nAccount.creditLine" data-readonly="SaveAccount.saveAccountFlag.creditLine"></input-amount>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Last Balance</label>
+                <div class="col-sm-10">
+                    <input-amount ng-model="SaveAccount.nAccount.lastBalance"
+                        data="SaveAccount.nAccount.lastBalance" data-readonly="SaveAccount.saveAccountFlag.lastBalance"></input-amount>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2">Balance</label>
+            <div class="col-sm-10">
+                <input-amount ng-model="SaveAccount.nAccount.balance"
+                    data="SaveAccount.nAccount.balance" data-readonly="SaveAccount.saveAccountFlag.balance"></input-amount>
+            </div>
+        </div>
+        <div ng-if="SaveAccount.account.type === 'CreditCard' || SaveAccount.nAccount.type === 'CreditCard'">
+            <div class="form-group">
+                <h4>Pending Transactions 
+                    <small><i class="glyphicon glyphicon-plus plus-symbol" ng-click="SaveAccount.addPendingTransactionRow()" ></i></small>
+                </h4>
+                <div ng-repeat="pendingTransaction in SaveAccount.nAccount.pendingTransactions" class="well">
+                    <i class="glyphicon glyphicon-remove plus-symbol" ng-click="SaveAccount.deletePendingTransactionRow($index)" ></i>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <label for="">Description</label>
+                            <input type="text" class="form-control" ng-model="pendingTransaction.description">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="">Date</label>
+                            <input date-input type="date" class="form-control" ng-model="pendingTransaction.date">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label for="">Type</label>
+                            <select class="form-control" ng-model="pendingTransaction.type">
+                                <option>Credit</option>
+                                <option>Debit</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="">Amount</label>
+                            <input type="number" class="form-control" ng-model="pendingTransaction.amount">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="">Category</label>
+                            <select name="" id="" class="form-control" ng-model="pendingTransaction.category">
+                                <option ng-repeat="transactionCategory in SaveAccount.transactionCategoryList">{{transactionCategory}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Threshold</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input type="number" class="form-control" ng-model="SaveAccount.nAccount.threshold" min="0" ng-readonly="SaveAccount.saveAccountFlag.threshold">
+                        <span class="input-group-addon">%</span>
+                        <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.threshold=!SaveAccount.saveAccountFlag.threshold">
+                            <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.threshold"></i>
+                            <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.threshold"></i>
+                        </span> 
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">APR 0 Enable</label>
+                <div class="col-sm-1">
+                    <input type="checkbox" ng-model="SaveAccount.nAccount.apr0Valid" ng-readonly="SaveAccount.saveAccountFlag.apr0Valid">
+                </div>
+                <div class="col-sm-4">
+                    <input type="date" date-input class="form-control" ng-model="SaveAccount.nAccount.apr0Date.startDate" ng-if="SaveAccount.nAccount.apr0Valid" 
+                        ng-readonly="SaveAccount.saveAccountFlag.apr0Date">
+                </div>
+                <div class="col-sm-1">
+                    <span ng-if="SaveAccount.nAccount.apr0Valid"> To </span>
+                </div>
+                <div class="col-sm-4">
+                    <input type="date" date-input class="form-control" ng-model="SaveAccount.nAccount.apr0Date.endDate" ng-if="SaveAccount.nAccount.apr0Valid" 
+                        ng-readonly="SaveAccount.saveAccountFlag.apr0Date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Pay By</label>
+                <div class="col-sm-10" ng-if="!SaveAccount.account">
+                    <div class="input-group">
+                        <select class="form-control" ng-model="SaveAccount.nAccount.payBy" ng-disabled="SaveAccount.saveAccountFlag.payBy">
+                            <option></option>
+                            <option ng-repeat="pbAccount in SaveAccount.payByAccounts" value="{{pbAccount._id}}">{{pbAccount.accountName}}</option>
+                        </select>
+                        <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.payBy=!SaveAccount.saveAccountFlag.payBy">
+                            <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.payBy"></i>
+                            <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.payBy"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-sm-10" ng-if="SaveAccount.account.payBy">
+                    <span>{{SaveAccount.account.payBy.accountName}}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Rewards</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input type="number" class="form-control" ng-model="SaveAccount.nAccount.rewards" ng-readonly="SaveAccount.saveAccountFlag.rewards">
+                        <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.rewards=!SaveAccount.saveAccountFlag.rewards">
+                            <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.rewards"></i>
+                            <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.rewards"></i>
+                        </span>  
+                    </div>              
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Reward Type</label>
+                <div class="col-sm-10">
+                    <label class="control-label">{{SaveAccount.nAccount.rewardRules[0].rule.rewardType}}</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="well" ng-repeat="rewardRule in SaveAccount.nAccount.rewardRules">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="">Reward Max</label>
+                            <input type="number" class="form-control" ng-model="rewardRule.rule.rewardMax" readonly>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="">Redeem Min</label>
+                            <input type="number" class="form-control" ng-model="rewardRule.rule.redeemMin" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="">Start Date</label>
+                            <input type="date" date-input class="form-control" ng-model="rewardRule.rule.startDate" readonly>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="">End Date</label>
+                            <input type="date" date-input class="form-control" ng-model="rewardRule.rule.endDate" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <label for="">Reward Category</label>
+                            <input type="text" class="form-control" ng-model="rewardRule.rule.rewardStrategy.rewardCategory" readonly>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="">Ratio</label>
+                            <input type="number" class="form-control" ng-model="rewardRule.rule.rewardStrategy.rewardRatio" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group text-right">
+            <button type="submit" class="btn btn-primary button-margin-right" ng-if="SaveAccount.saveAccountFlag.submit" 
+                ng-click="SaveAccount.addAccount(SaveAccount.nAccount)">Submit</button>
+            <button type="submit" class="btn btn-primary button-margin-right" ng-if="SaveAccount.saveAccountFlag.edit"
+                ng-click="SaveAccount.updateAccount(SaveAccount.nAccount)">Edit</button>
+			<button type="button" class="btn btn-default button-margin-right" ng-if="SaveAccount.saveAccountFlag.resetSubmit">Reset</button>
+			<button type="button" class="btn btn-default button-margin-right" ng-if="SaveAccount.saveAccountFlag.resetEdit" 
+                ng-click="SaveAccount.resetEdit(SaveAccount.nAccount)">Reset</button>
+			<button type="button" class="btn btn-default" ng-click="SaveAccount.cancelModal()">Cancel</button>           
+        </div>
+    </form>
+</div>

@@ -1,0 +1,5 @@
+{
+  "verbose": true,
+  "ignore": ["public/*", "client/*", "README.md", "DB_Backup",
+  				"gulpfile.js", "test/*", "server/.template", "db/*"]
+}

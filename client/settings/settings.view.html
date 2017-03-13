@@ -1,0 +1,16 @@
+<form class="form-horizontal">
+  <div class="form-group">
+    <label>Confirmed Date</label>
+    <input type="date" class="form-control" ng-model="Settings.settings.accountConfirmDate"> 
+  </div>
+  <div class="form-group">
+    <label>Transaction Category</label>
+    {{Settings.transactionCategory}}
+    <textarea class="form-control" ng-model="Settings.settings.transactionCategory" ng-list=";">
+    </textarea>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-primary" ng-click="Settings.updateSettings()">Update</button>
+    <button type="reset" class="btn btn-default">Reset</button>
+  </div>
+</form>

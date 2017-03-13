@@ -1,0 +1,26 @@
+<h3 class="text-center">...</h3>
+<div>
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation" ng-class="{ active: isActive('home') }">
+			<a href="/home">Home</a>
+		</li>
+		<li role="presentation" ng-class="{ active: isActive('payment') }">
+			<a href="/payment">Payment</a>
+		</li>
+		<li role="presentation" ng-class="{ active: isActive('account') }">
+			<a href="/account">Account</a>
+		</li>
+		<li ng-show="isLoggedIn" role="presentation" ng-class="{ active: isActive('admin') }">
+			<a href="/admin/overviews">Admin</a>
+		</li>
+		<li role="presentation" ng-class="{ active: isActive('prediction') }">
+			<a href="/prediction">Prediction</a>
+		</li>
+		<li role="presentation" ng-class="{ active: isActive('account-default') }">
+			<a href="/account-default">Account Default</a>
+		</li>
+		<li role="presentation" ng-class="{ active: isActive('settings') }">
+			<a href="/settings">Settings</a>
+		</li>
+	</ul>
+</div>

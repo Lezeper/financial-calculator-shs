@@ -1,0 +1,89 @@
+<!--Statements Begin-->
+<div class="form-center" ng-init="showSelectedDateModalCtrl.statement.lastBalanceSum=0;
+                                          showSelectedDateModalCtrl.statement.avaliableBalanceSum=0">
+  <h3 class="text-center" style="margin-top: 30px">{{showSelectedDateModalCtrl.statement.date}}</h3>
+  <ul class="list-group">
+    <li class="list-group-item">
+      <div class="page-header">
+        <h3 class="text-center">
+          Account Details
+        </h3>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Type</th>
+            <th>Balance(Usage)</th>
+            <th>Last Balance</th>
+            <th>Avaliable Balance</th>
+            <th>Rewards</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="account in showSelectedDateModalCtrl.statement.accountsDetails">
+            <td><button class="btn-link" ng-click="">{{ account.accountName }}</button></td>
+            <td>{{ account.type }}</td>
+            <td ng-class="account.balance < 0 ? 'btn-danger' : null">
+              {{ account.balance | currency: "$": 2 }}
+              <span ng-if="account.creditLine" ng-class="account.balance/account.creditLine*100 >= 100 ? 'btn-danger' : null">
+                ({{account.balance/account.creditLine*100 | number: 0}}%)
+              </span>
+              <span ng-if="account.changed"
+                ng-class="((account.changed > 0 && account.type==='CreditCard') 
+                  || (account.changed < 0 && account.type!=='CreditCard')) 
+                  ? 'finance-warning' : 'finance-safe'">
+                ({{ account.changed | currency: "$": 2 }})
+              </span>
+            </td>
+            <td ng-init="showSelectedDateModalCtrl.statement.lastBalanceSum=(showSelectedDateModalCtrl.statement.lastBalanceSum+account.lastBalance)">
+              {{ account.lastBalance | currency: "$": 2 }}
+            </td>
+            <!-- AB: Avaliable Balance means suppose you will pay off the last balance, the rest of money you can leave there below the threshold -->
+            <td ng-if="account.type === 'CreditCard'" 
+                ng-init="showSelectedDateModalCtrl.statement.avaliableBalanceSum=(showSelectedDateModalCtrl.statement.avaliableBalanceSum+(account.creditLine * (account.threshold / 100) - account.balance + account.lastBalance))">
+              {{ account.creditLine * (account.threshold / 100) - account.balance + account.lastBalance | currency: "$": 2 }} ({{ account.threshold }}%)
+            </td>
+            <td ng-if="account.type !== 'CreditCard'" ng-init="showSelectedDateModalCtrl.statement.avaliableBalanceSum=(showSelectedDateModalCtrl.statement.avaliableBalanceSum + (account.balance * (account.threshold / 100)))">
+              {{ account.balance * (account.threshold / 100) | currency: "$": 2 }} ({{ account.threshold }}%)
+            </td>
+            <td>
+              <span ng-if="account.rewardRules[0].rule.rewardType === 'Cash'">{{account.rewards | currency: "$": 2}}</span>
+              <span ng-if="account.rewardRules[0].rule.rewardType === 'Point'">{{account.rewards | number: 0}}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+    <li class="list-group-item text-right">
+      <strong>Total Last Balance: {{ showSelectedDateModalCtrl.statement.lastBalanceSum | currency: "$": 2 }}</strong><br>
+      <strong>Total Avaliable Balance Now: {{ showSelectedDateModalCtrl.statement.avaliableBalanceSum | currency: "$": 2 }}</strong>
+    </li>
+    <li class="list-group-item">
+      <div class="page-header">
+        <h3 class="text-center">
+          Transactions
+        </h3>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Account</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="transaction in showSelectedDateModalCtrl.statement.transactions">
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.type }}</td>
+            <td>{{ transaction.amount | currency: "$": 2 }}</td>
+            <td><button class="btn-link" style="padding-left: 0" ng-click="">{{ transaction.accountName }}</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+  </ul>
+</div>
+<!--Statements End-->

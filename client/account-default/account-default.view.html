@@ -1,0 +1,147 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <!--default accounts Start-->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Account Name</th>
+        <th>Type</th>
+        <th>RewardType</th>
+        <th>Reward Rules</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="accountDefault in AccountDefault.accountDefaultList">
+        <td>{{accountDefault.accountName}}</td>
+        <td>{{accountDefault.type}}</td>
+        <td>{{accountDefault.rewardType}}</td>
+        <td>
+          <button class="btn-link" ng-repeat="rr in accountDefault.rewardRules" 
+            ng-click="AccountDefault.showRewardRuleModal(rr)">{{rr.description}}</button>
+        </td>
+        <td>
+          <button class="btn-link"><i class="glyphicon glyphicon glyphicon-remove"
+							ng-click="AccountDefault.removeAccountDefault(accountDefault._id)"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <!--default accounts End-->
+  <!--Add a default page Start-->
+  <div class="page-header">
+    <h3>Add a Default Account</h3>
+  </div>
+  <form class="form-horizontal" ng-submit="AccountDefault.submitAccountDefault(newAccountDefault)">
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="form-group">
+          <label>Account Name</label>
+          <input type="text" class="form-control" ng-model="newAccountDefault.accountName" required>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group">
+          <label>Type</label>
+          <select class="form-control" ng-model="newAccountDefault.type" required>
+            <option>Cash</option>
+            <option>Checking</option>
+            <option>Saving</option>
+            <option>CreditCard</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group">
+          <label for="">Reward Type</label>
+          <select name="" id="" class="form-control" ng-model="newAccountDefault.rewardType">
+            <option>Point</option>
+            <option>Cash</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <h4>Reward Rules <span class="btn glyphicon glyphicon-plus" 
+      ng-click="AccountDefault.addRewardRuleRow()"></span>
+    </h4>
+    <!--some data in DB Start-->
+    <div class="form-group">
+      <label>Default Reward Rules</label>
+      <br>
+      <span ng-repeat="rrdb in AccountDefault.rewardRulesInDB">
+        <label class="checkbox-inline">
+          <input type="checkbox" id="inlineCheckbox1" value="option1" ng-model="rrdb.isSelected" ng-init="rrdb.isSelected=false"> 
+          {{rrdb.description}}
+        </label>
+      </span>
+    </div>
+    <!--some data in DB End-->
+    <div class="row well" ng-repeat="rewardRule in AccountDefault.newRewardRules track by $index">
+      <div class="form-group">
+        <label for="">Description</label>
+        <input type="text" class="form-control" ng-model="rewardRule.description">
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <div class="form-group">
+            <label for="">Reward Max</label>
+            <input type="number" class="form-control" ng-model="rewardRule.rewardMax">
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <label for="">Redeem Min</label>
+            <input type="number" class="form-control" ng-model="rewardRule.redeemMin">
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label for="">Start Date</label>
+            <input type="date" class="form-control" ng-model="rewardRule.startDate">
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label for="">End Date</label>
+            <input type="date" class="form-control" ng-model="rewardRule.endDate">
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group text-right">
+            <br> 
+            <button class="btn btn-warning" ng-click="AccountDefault.deleteRewardRuleRow($index)">
+              <i class="glyphicon glyphicon-remove"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <h4>Reward Strategies</h4>
+      <div class="row">
+        <div class="col-sm-10">
+          <div class="form-group">
+            <label for="">Reward Category (seperate by ;)</label>
+            <input type="text" class="form-control" ng-list=";" ng-model="rewardRule.rewardStrategy.rewardCategory">
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <label for="">Reward Ratio</label>
+            <input type="number" class="form-control" ng-model="rewardRule.rewardStrategy.rewardRatio">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </form>
+  <!--Add a default page End-->
+</body>
+</html>

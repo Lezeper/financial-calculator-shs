@@ -1,0 +1,82 @@
+<!--One Time Payment-->
+<div id="one-time-payment">
+	<div class="page-header">
+		<h3>Transaction
+			<small><i class="glyphicon glyphicon-plus plus-symbol" ng-click="Payment.showAddTransaction()" ></i></small>
+		</h3>
+	</div>
+	<div class="div-scrollable">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Description</th>
+					<th>Type</th>
+					<th>Date</th>
+					<th>Amount</th>
+					<th>Account</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="transaction in Payment.transactioins">
+					<td>{{transaction.description}}</td>
+					<td>{{transaction.type}}</td>
+					<td>{{transaction.date | date}}</td>
+					<td>{{transaction.amount | currency: "$" : 2}}</td>
+					<td>{{transaction.payBy.accountName}}</td>
+					<td>
+						<!--<button class="btn-link"><i class="glyphicon glyphicon-pencil"></i></button>-->
+						<button class="btn-link"><i class="glyphicon glyphicon glyphicon-remove" 
+							ng-click="Payment.removeTransaction(transaction._id)"></i></button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<!--One Time Payment End-->
+<!--Recurring Payment-->
+<div id="recurring-payment">
+	<div class="page-header">
+		<h3>Recurring Payment
+			<small><i class="glyphicon glyphicon-plus plus-symbol" ng-click="Payment.showAddRecurring()" ></i></small>
+		</h3>
+	</div>
+	<div class="div-scrollable">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Description</th>
+					<th>Type</th>
+					<th>Amount</th>
+					<th>Account</th>
+					<th>Date</th>
+					<th>Period</th>
+					<th>Duration</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="recurring in Payment.recurringPayments">
+					<td>{{recurring.description}}</td>
+					<td>{{recurring.type}}</td>
+					<td>{{recurring.amount | currency: "$": 2}}</td>
+					<td>{{recurring.payBy.accountName}}</td>
+					<td>{{recurring.recurringDate}}</td>
+					<td>{{recurring.recurringPeriod}}</td>
+					<td>
+						{{recurring.startDate === '11/11/1111' ? '' : recurring.startDate | date}}
+						{{recurring.startDate !== '1/1/1' ? '-' : ''}} 
+						{{recurring.endDate === '9/9/9999' ? 'Never' : recurring.endDate | date}}
+					</td>
+					<td>
+						<!--<button class="btn-link"><i class="glyphicon glyphicon-pencil"></i></button>-->
+						<button class="btn-link"><i class="glyphicon glyphicon glyphicon-remove"
+							ng-click="Payment.removeRecurring(recurring._id)"></i></button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<!--Recurring Payment End-->
