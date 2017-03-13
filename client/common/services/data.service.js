@@ -10,6 +10,10 @@
       return $http.get(_this.financialServerUrl + '/predict?sd=' + startDate + '&ed=' + endDate);
     }
 
+    var canHasTransaction = function(startDate, endDate, transaction) {
+      return $http.get(_this.financialServerUrl + '/predict/trans?sd=' + startDate + '&ed=' + endDate, transaction);
+    }
+
     /* Recurring Payment */
     var getRecurringPayments = function() {
       return $http.get(_this.financialServerUrl + '/recurring');

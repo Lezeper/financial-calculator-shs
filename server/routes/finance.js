@@ -8,7 +8,8 @@ var accountDefaultCtrl = require('../controllers/finance/account-default');
 var rewardRuleCtrl = require('../controllers/finance/reward-rule');
 var settingsCtrl = require('../controllers/finance/settings');
 
-router.get('/predict', predictionCtrl.doFinancialPredict);
+router.get('/predict?', predictionCtrl.doFinancialPredict);
+router.get('/predict/trans?', predictionCtrl.canHasTransaction);
 /* Recurring Payment */
 router.get('/recurring?', recurringCtrl.getRecurringPaymentsReq);
 router.post('/recurring', recurringCtrl.addRecurringPaymentReq);

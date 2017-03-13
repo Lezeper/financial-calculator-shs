@@ -63,6 +63,7 @@
 				_this.events = res.data.events;
 				_this.financeDangerDate = res.data.financeDangerDate;
 				_this.statements = res.data.statements;
+				_this.lowestBalanceInAccountList = res.data.lowestBalanceInAccountList;
 
 				_this.calendarDisplayerOptions = {
 					customClass: getDayClass,

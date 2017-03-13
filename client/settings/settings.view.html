@@ -14,3 +14,51 @@
     <button type="reset" class="btn btn-default">Reset</button>
   </div>
 </form>
+<div class="page-header">
+  <h4>Can I spend?</h4>
+</div>
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="">Amount</label>
+    <input type="number" step="0.01" ng-model="Settings.canTransaction.amount">
+  </div>
+  <div class="form-group">
+    <label for="">Date</label>
+    <input type="date" ng-model="Settings.canTransaction.date">
+  </div>
+  <div class="form-group">
+    <label for="">Category</label>
+    <select ng-model="Settings.canTransaction.category">
+      <option ng-repeat="category in Settings.settings.transactionCategory">{{category}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="">End Date</label>
+    <input type="date" ng-model="Settings.canTransaction.endDate">
+  </div>
+  <div class="form-group">
+    <button class="btn btn-primary" ng-click="Settings.canHasTransaction(Settings.canTransaction)">Show Me</button>
+  </div>
+</form>
+<hr>
+<div class="row" ng-if="Settings.avaliableAccounts.length > 0">
+  <div ng-repeat="temp in Settings.avaliableAccounts">
+    <h4>Avaliable Account: {{temp.avaliableAccount.accountName}}</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Account Name</th>
+          <th>Balance</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="account in temp.lowestBalanceInAccountList">
+          <td>{{account.accountName}}</td>
+          <td>{{account.balance}}</td>
+          <td>{{account.date}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
