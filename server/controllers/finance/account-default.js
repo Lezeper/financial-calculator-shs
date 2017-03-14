@@ -65,7 +65,9 @@ module.exports.addAccountDefaultReq = function(req, res) {
 }
 
 module.exports.updateAccountDefaultReq = function(req, res) {
-  AccountDefault.findOneAndUpdate({_id: req.body._id}, req.body, function(err, accountDefault){
+  var _id = req.body._id;
+  delete req.body._id;
+  AccountDefault.findOneAndUpdate({_id: _id}, req.body, function(err, accountDefault){
     if(err)
       return res.status(500).send(err);
     res.status(200).send({

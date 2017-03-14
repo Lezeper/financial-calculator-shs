@@ -31,6 +31,10 @@ module.exports.dateString = function(date, flag){
     return date.format('MM/DD/YYYY');
 }
 
+module.exports.timeDiff = function(startTime, endTime, unit) {
+  return dateValidator(endTime).diff(startTime, unit);
+}
+
 module.exports.nextPostedDay = function(date) {
   date = dateValidator(date);
   if(date.format('dddd') === 'Friday') {

@@ -51,7 +51,8 @@ module.exports.addTransactionReq = function(req, res) {
 }
 
 module.exports.updateTransactionReq = function(req, res) {
-  Transaction.findOneAndUpdate({_id: req.body._id}, req.body, function(err, rTransaction){
+  var _id = req.body._id;
+  Transaction.findOneAndUpdate({_id: _id}, req.body, function(err, rTransaction){
     if(err)
 			return res.status(500).send(err);
 		res.status(200).json({

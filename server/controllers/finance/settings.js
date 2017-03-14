@@ -37,7 +37,8 @@ module.exports.updateSettingsReq = function(req, res) {
       res.status(500).send(err);
     });
   } else {
-    Settings.findOneAndUpdate({_id: req.body._id}, req.body).then(function(settings){
+    var _id = req.body._id;
+    Settings.findOneAndUpdate({_id: _id}, req.body).then(function(settings){
       res.status(200).send({
         msg: "Settings Updated.",
         data: settings

@@ -98,7 +98,9 @@ module.exports.addAccountReq = function(req, res) {
 
 module.exports.updateAccountReq = function(req, res){
   req.body.updatedDate = new Date();
-  Account.findOneAndUpdate({_id: req.body._id}, req.body, function(err, rAccount){
+  var _id = req.body._id;
+  delete req.body._id;
+  Account.findOneAndUpdate({_id: _id}, req.body, function(err, rAccount){
     if(err)
 			return res.status(500).send(err);
 		res.status(200).json({

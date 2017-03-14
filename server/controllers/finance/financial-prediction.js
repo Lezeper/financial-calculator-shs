@@ -380,7 +380,7 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
       _id: key
     });
   });
-  
+
   var result = UtilCtrl.clone({
     events: events,
     financeDangerDate: financeDangerDate,
@@ -398,6 +398,8 @@ module.exports.canHasTransaction = function(req, res) {
   var amount = req.body.amount;
   var date = req.body.date;
   var category = req.body.category;
+
+  var tempTimerBegin = new Date();
 
   if(_.isNil(startDate))
     startDate = UtilCtrl.getCurrentDate();
@@ -441,6 +443,7 @@ module.exports.canHasTransaction = function(req, res) {
         }
 
         if(index == resData[0].accountsDetails.length-1){
+          console.info("Time Usage: " + UtilCtrl.timeDiff(tempTimerBegin, new Date(), 'ms'));
           res.status(200).send(avaliableAccounts);
         }
       });

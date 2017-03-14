@@ -49,7 +49,9 @@ module.exports.addRecurringPaymentReq = function(req, res) {
 }
 
 module.exports.updateRecurringPaymentReq = function(req, res) {
-  Recurring.findOneAndUpdate({_id: req.body._id}, req.body, function(err, rRecurring){
+  var _id = req.body._id;
+  delete req.body._id;
+  Recurring.findOneAndUpdate({_id: _id}, req.body, function(err, rRecurring){
     if(err)
       return res.status(500).send(err);
     res.status(200).send({

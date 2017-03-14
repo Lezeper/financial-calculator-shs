@@ -140,6 +140,9 @@
         how much rates I need to have?
         use reward to pay options
         change use accountname + card# as name and key
+        if duedate not updated, it will never deducted balance
+        gift card 
 ## Issue
         1. moment object add/substract method will replace variable.
         But format method will not.
+        2. need to delete _id to update records in mongodb v2.4

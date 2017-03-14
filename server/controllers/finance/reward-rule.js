@@ -42,7 +42,9 @@ module.exports.addRewardRuleReq = function(req, res) {
 }
 
 module.exports.updateRewardRuleReq = function(req, res) {
-  RewardRule.findOneAndUpdate({_id: req.body._id}, req.body, function(err, rRewardRule){
+  var _id = req.body._id;
+  delete req.body._id;
+  RewardRule.findOneAndUpdate({_id: _id}, req.body, function(err, rRewardRule){
     if(err)
       return res.status(500).send(err);
     res.status(200).send({
