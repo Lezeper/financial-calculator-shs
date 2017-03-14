@@ -10,8 +10,8 @@
       return $http.get(_this.financialServerUrl + '/predict?sd=' + startDate + '&ed=' + endDate);
     }
 
-    var canHasTransaction = function(startDate, endDate, transaction) {
-      return $http.get(_this.financialServerUrl + '/predict/trans?sd=' + startDate + '&ed=' + endDate, transaction);
+    var canHasTransaction = function(transaction) {
+      return $http.put(_this.financialServerUrl + '/predict/trans', transaction);
     }
 
     /* Recurring Payment */
@@ -130,7 +130,8 @@
       deleteRewardRule: deleteRewardRule,
       getAccountsNotCreditCard: getAccountsNotCreditCard,
       getSettings: getSettings,
-      updateSettings: updateSettings
+      updateSettings: updateSettings,
+      canHasTransaction: canHasTransaction
     }
   }])
 })();

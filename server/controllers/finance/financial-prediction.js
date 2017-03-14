@@ -166,14 +166,14 @@ var findAccountPayCreditCart = function(accounts, cc, needPay, description) {
       if(lowestBalanceAccounts.has(account._id)){
         if(lowestBalanceAccounts.get(account._id).balance*1 > account.balance){
           lowestBalanceAccounts.set(account._id, 
-            Util.clone({
+            UtilCtrl.clone({
               date: currentCalculatingDate, balance: account.balance, accountName: account.accountName
             })
           );
         }
       } else {
         lowestBalanceAccounts.set(account._id, 
-          Util.clone({
+          UtilCtrl.clone({
             date: currentCalculatingDate, balance: account.balance, accountName: account.accountName
           })
         );
@@ -259,9 +259,9 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
   var events = []; // date and status
   var financeDangerDate = [];
   lowestBalanceAccounts = new Map(); // {_id, balance}
+  currentFinanceSafe = true; // no negative balance on checking or saving account
 
-  var financeCriseList = [];
-  var maxNumberOfCrise = 5;
+  var maxCushionDay = 5;
 
   // make sure date format is correct
   startDate = UtilCtrl.dateValidator(startDate);
@@ -270,10 +270,10 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
   var latestAccountsInfoDate = UtilCtrl.dateValidator(latestAccountsInfo.date);
   // start date can not earlier than lastest accounts date
   if(startDate.diff(new Date(latestAccountsInfo.date), 'days') < 0)
-    return alert("start date can not earlier than lastest accounts date");
+    return console.error("start date can not earlier than lastest accounts date");
   // end date can not earlier than lastest accounts date and start date
   if(endDate.diff(new Date(latestAccountsInfo.date), 'days') < 0 || endDate.diff(new Date(startDate.date), 'days') < 0)
-    return alert("end date can not earlier than lastest accounts date and start date");
+    return console.error("end date can not earlier than lastest accounts date and start date");
   
   // statements.push(UtilCtrl.clone(latestAccountsInfo));
   var duration = endDate.diff(latestAccountsInfoDate, 'days');
@@ -284,15 +284,15 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
   // calculating statement each day
   for(var i = 0; i < duration; i++) {
     // break the loop if too many crise found
-    if(financeCriseList.length > maxNumberOfCrise)
+    if(maxCushionDay < 0)
       break;
 
     currentCalculatingDate.add(1, 'days');
 
     // initial data here...
     var currentStatement;
-    currentFinanceSafe = true; // no negative balance on checking or saving account
-    currentTransactions.length = 0;
+    
+    var currentTransactions = [];
     // clean needPay property
     deleteChanged(tempAccountsDetails);
     // pending convert to balance check
@@ -350,7 +350,6 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
         }
       }
     }
-    
     currentStatement = {date: UtilCtrl.dateString(currentCalculatingDate, 0), accountsDetails: tempAccountsDetails, 
             transactions: currentTransactions};
 
@@ -358,14 +357,18 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
     if (currentCalculatingDate.diff(startDate, 'days') >= 0 && currentTransactions.length > 0){
       statements.push(UtilCtrl.clone(currentStatement));
       // Calendar Finance Status Settings
-      var financeStatus = currentFinanceSafe == true ? "cal-finance-safe" : "cal-finance-warning";
-      if(financeStatus === 'cal-finance-warning')
-          financeDangerDate.push(UtilCtrl.dateString(currentCalculatingDate, 1));
+      var financeStatus;
+      if(currentFinanceSafe){
+        financeStatus = "cal-finance-safe";
+      } else {
+        financeStatus = "cal-finance-warning";
+        financeDangerDate.push(UtilCtrl.dateString(currentCalculatingDate, 1));
+      }
       events.push({date: UtilCtrl.dateString(currentCalculatingDate, 1), financeStatus: financeStatus});
     }
 
     if(!currentFinanceSafe)
-      financeCriseList.push('Danger');
+      maxCushionDay--;
   }
 
   var lowestBalanceInAccountList = [];
@@ -378,63 +381,75 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
     });
   });
   
-  var result = {
+  var result = UtilCtrl.clone({
     events: events,
     financeDangerDate: financeDangerDate,
     statements: statements,
     // lowestBalanceAccounts: lowestBalanceAccounts
     lowestBalanceInAccountList: lowestBalanceInAccountList
-  }
+  });
   
   return result;
 }
 
 module.exports.canHasTransaction = function(req, res) {
-  var startDate = req.query.sd;
-  var endDate = req.query.ed;
+  var startDate = req.body.startDate;
+  var endDate = req.body.endDate;
   var amount = req.body.amount;
   var date = req.body.date;
   var category = req.body.category;
 
-  Promise.all([
-    AccountCtrl.getAccounts(),
-    TransactionCtrl.getTransactions(),
-    RecurringCtrl.getRecurringPayments(),
-  ]).then(function(resData){
-    // [{avaliableAccount}, [lowestBalanceInAccountList]]
-    var avaliableAccounts = [];
-    var transaction = {
-      amount: amount,
-      date: date,
-      category: category, // maybe can use reward to pay
-      type: "Debit",
-      payBy: null
-    };
+  if(_.isNil(startDate))
+    startDate = UtilCtrl.getCurrentDate();
+  if(_.isNil(endDate))
+    return console.error("End Date not defined");
+  
+  endDate = UtilCtrl.getCurrentDate().add(endDate, 'month');
+  
+  if(!_.isNil(date) && !_.isNil(amount)){
+    Promise.all([
+      AccountCtrl.getAccounts(),
+      TransactionCtrl.getTransactions(),
+      RecurringCtrl.getRecurringPayments(),
+    ]).then(function(resData){
+      // [{avaliableAccount}, [lowestBalanceInAccountList], [statements]]
+      var avaliableAccounts = [];
+      var transaction = {
+        amount: amount,
+        date: date,
+        category: category, // maybe can use reward to pay
+        type: "Debit",
+        payBy: null
+      };
+      
+      UtilCtrl.clone(resData[0]).accountsDetails.forEach(function(account, index){
+        var transactions = UtilCtrl.clone(resData[1]);
+        var latestAccountsInfo = UtilCtrl.clone(resData[0]);
+        var recurringPayments = UtilCtrl.clone(resData[2]);
 
-    latestAccountsInfo.forEach(function(account){
-      var latestAccountsInfo = Util.clone(resData[0]);
-      var transactions = Util.clone(resData[1]);
-      var recurringPayments = Util.clone(resData[2]);
+        transaction.payBy = account;
+        transactions.push(UtilCtrl.clone(transaction));
 
-      transaction.payBy = account;
-      transactions.push(Util.clone(transaction));
+        var predictResult = UtilCtrl.clone(doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, recurringPayments));
+        
+        if(predictResult.financeDangerDate.length == 0) {
+          avaliableAccounts.push(UtilCtrl.clone({
+            avaliableAccount: account,
+            lowestBalanceInAccountList: predictResult.lowestBalanceInAccountList,
+            statements: predictResult.statements
+          }));
+        }
 
-      var predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, recurringPayments);
-
-      if(predictResult.financeDangerDate.length == 0) {
-        avaliableAccounts.push(Util.clone({
-          avaliableAccount: account,
-          lowestBalanceInAccountList: predictResult.lowestBalanceInAccountList
-        }));
-      }
+        if(index == resData[0].accountsDetails.length-1){
+          res.status(200).send(avaliableAccounts);
+        }
+      });
     });
-
-    res.status(200).send(avaliableAccounts);
-  });
+  }
 }
 
 module.exports.doFinancialPredict = function(req, res) {
-  if(_.isNaN(req.query.sd) && _.isNil(req.query.ed)) {
+  if(!_.isNil(req.query.sd) && !_.isNil(req.query.ed)) {
     Promise.all([
       AccountCtrl.getAccounts(),
       TransactionCtrl.getTransactions(),

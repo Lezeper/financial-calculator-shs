@@ -18,7 +18,7 @@
     }
 
     _this.canHasTransaction = function(transaction){
-      meanData.canHasTransaction(new Date(), transaction.endDate, transaction).then(function(res){
+      meanData.canHasTransaction(transaction).then(function(res){
         if(res.data.length == 0)
           return alert("You can't has this transaction");
         _this.avaliableAccounts = res.data;

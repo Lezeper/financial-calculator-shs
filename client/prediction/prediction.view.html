@@ -16,8 +16,8 @@
 		<tbody>
 			<tr ng-repeat="lowestBalanceInAccount in Prediction.lowestBalanceInAccountList">
 				<td>{{lowestBalanceInAccount.accountName}}</td>
-				<td>{{lowestBalanceInAccount.balance}}</td>
-				<td>{{lowestBalanceInAccount.date}}</td>
+				<td>{{lowestBalanceInAccount.balance | currency: $: 2}}</td>
+				<td>{{lowestBalanceInAccount.date | date}}</td>
 			</tr>
 		</tbody>
 	</table>

@@ -20,21 +20,27 @@
 <form class="form-horizontal">
   <div class="form-group">
     <label for="">Amount</label>
-    <input type="number" step="0.01" ng-model="Settings.canTransaction.amount">
+    <input type="number" step="0.01" class="form-control" ng-model="Settings.canTransaction.amount">
   </div>
   <div class="form-group">
     <label for="">Date</label>
-    <input type="date" ng-model="Settings.canTransaction.date">
+    <input type="date" class="form-control" ng-model="Settings.canTransaction.date">
   </div>
   <div class="form-group">
     <label for="">Category</label>
-    <select ng-model="Settings.canTransaction.category">
+    <select class="form-control" ng-model="Settings.canTransaction.category">
       <option ng-repeat="category in Settings.settings.transactionCategory">{{category}}</option>
     </select>
   </div>
   <div class="form-group">
-    <label for="">End Date</label>
-    <input type="date" ng-model="Settings.canTransaction.endDate">
+    <label for="">Prediction for next n months</label>
+    <select class="form-control" ng-model="Settings.canTransaction.endDate">
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+      <option>4</option>
+      <option>5</option>
+    </select>
   </div>
   <div class="form-group">
     <button class="btn btn-primary" ng-click="Settings.canHasTransaction(Settings.canTransaction)">Show Me</button>
@@ -55,8 +61,8 @@
       <tbody>
         <tr ng-repeat="account in temp.lowestBalanceInAccountList">
           <td>{{account.accountName}}</td>
-          <td>{{account.balance}}</td>
-          <td>{{account.date}}</td>
+          <td>{{account.balance | currency: $: 2}}</td>
+          <td>{{account.date | date}}</td>
         </tr>
       </tbody>
     </table>

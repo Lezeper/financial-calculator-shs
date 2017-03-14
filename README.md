@@ -8,8 +8,8 @@
           the lowest balance for each accounts during this period.
         * Calculate purchase category rewards.
         * Determine whether this transaction will crash me. If no,
-          tell me what account I can use.
-        * Determine how much money you need for current plan.
+          tell me what account I can use and show me transactions.
+        ~ Determine how much money you need for current plan.
 ## Library
         Angular 1.6
         Node.js 6.9.1
@@ -21,7 +21,7 @@
 ## REST Api (/rest)
 #### Financial Prediction (/finance)
         GET     /predict?sd=&ed=         - Do financial prediction
-        GET     /predict/trans?sd=&ed=   - Can I have this transaction
+        PUT     /predict/trans           - Can I have this transaction
         GET     /recurring               - Get All recurring payments
         POST    /recurring               - Add recurring payment
         PUT     /recurring               - Update recurring payment
