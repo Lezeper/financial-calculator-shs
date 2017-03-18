@@ -9,7 +9,8 @@ var rewardRuleCtrl = require('../controllers/finance/reward-rule');
 var settingsCtrl = require('../controllers/finance/settings');
 
 router.get('/predict?', predictionCtrl.doFinancialPredict);
-router.put('/predict/trans', predictionCtrl.canHasTransaction);
+router.get('/predict/coms-cap', predictionCtrl.comsumptionCapacityByDateReq);
+router.put('/predict/trans', predictionCtrl.canHasTransactionReq);
 /* Recurring Payment */
 router.get('/recurring?', recurringCtrl.getRecurringPaymentsReq);
 router.post('/recurring', recurringCtrl.addRecurringPaymentReq);

@@ -1,11 +1,12 @@
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var Settings = mongoose.model('Settings');
 var _ = require('lodash');
 
 var getSettings = function(need){
   need = _.isNil(need) || need === 'undefined' ? {} : need;
 
-  return Settings.find({}, need).limit(1);
+  return Settings.find({}, need).limit(1).exec();
 }
 
 module.exports.getSettings = getSettings;
@@ -16,7 +17,8 @@ module.exports.getSettingsReq = function(req, res) {
       msg: "Settings Found.",
       data: settings
     });
-  }, function(err){
+  })
+  .catch(function(err){
     res.status(500).send(err);
   });
 }
@@ -38,6 +40,7 @@ module.exports.updateSettingsReq = function(req, res) {
     });
   } else {
     var _id = req.body._id;
+    delete req.body._id;
     Settings.findOneAndUpdate({_id: _id}, req.body).then(function(settings){
       res.status(200).send({
         msg: "Settings Updated.",

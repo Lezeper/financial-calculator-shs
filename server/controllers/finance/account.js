@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var UtilCtrl = require('../util');
 var SettingsCtrl = require('./settings');
 var Account = mongoose.model('Account');

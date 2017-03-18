@@ -1,15 +1,10 @@
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var Recurring = mongoose.model('Recurring');
 var UtilCtrl = require('../util');
 
 var getRecurringPayments = function() {
-  return new Promise(function(resolve, reject){
-    Recurring.find().populate('payBy').exec(function(err, recurrings){
-      if(err)
-        reject(reject);
-      resolve(recurrings);
-    });
-  });
+    return Recurring.find().populate('payBy').exec();
 }
 
 module.exports.getRecurringPayments = getRecurringPayments;
@@ -20,9 +15,10 @@ module.exports.getRecurringPaymentsReq = function(req, res) {
       msg: "Recurring Found.",
       data: recurrings
     });
-  }, function(err){
+  })
+  .catch(function(err){
     res.status(500).send(err);
-  });
+  })
 }
 
 module.exports.addRecurringPaymentReq = function(req, res) {

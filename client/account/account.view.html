@@ -24,8 +24,8 @@
 			<td class="cursor-hand" ng-click="Account.showAccountModal(account.accountName, account)"><img src="./img/{{account.accountName}}.png" 
 				class="account-thumbnail" alt="{{account.accountName}}" title="{{account.accountName}}"></td>
 			<td>{{account.updatedDate | date:'MM/dd'}}</td>
-			<td>{{account.dueDate | date:'MM/dd'}}</td>
-			<td>{{account.closingDate | date:'MM/dd'}}</td>
+			<td>{{account.dueDate}}</td>
+			<td>{{account.closingDate}}</td>
 			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('lastBalance', account.lastBalance, account)">{{account.lastBalance | currency: "$": 2}}</td>
 			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('balance', account.balance, account)">{{account.balance | currency: "$": 2}}</td>
 			<td class="cursor-hand">{{account.pendingTransactions.length}}</td>

@@ -24,5 +24,12 @@
         _this.avaliableAccounts = res.data;
       });
     }
+
+    _this.comsumptionCapacityByDate = function(date) {
+      date = moment().add(1, 'day');
+      meanData.comsumptionCapacityByDate(date).then(function(res){
+
+      });
+    }
   }]);
 })();

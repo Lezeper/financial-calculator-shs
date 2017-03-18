@@ -1,20 +1,15 @@
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var Transaction = mongoose.model('Transaction');
 var _ = require('lodash');
 var UtilCtrl = require('../util');
 
 var getTransactions = function(isPending) {
-  return new Promise(function(resolve, reject){
-    var conditions = {};
-    if(!_.isNil(isPending)) {
-      conditions = {'isPending': isPending};
-    }
-    return Transaction.find(conditions).populate('payBy').exec(function(err, transactions){
-      if(err)
-			  reject(err);
-      resolve(transactions);
-    });
-  });
+  var conditions = {};
+  if(!_.isNil(isPending)) {
+    conditions = {'isPending': isPending};
+  }
+  return Transaction.find(conditions).populate('payBy').exec();
 }
 
 module.exports.getTransactions = getTransactions;
@@ -25,7 +20,8 @@ module.exports.getTransactionsReq = function(req, res) {
 			msg: "Transaction Found.",
       data: transactions
 		});
-  }, function(err){
+  })
+  .catch(function(err){
     res.status(500).send(err);
   });
 }

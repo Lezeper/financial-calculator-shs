@@ -9,9 +9,13 @@
     var doFinancialPrediction = function(startDate, endDate) {
       return $http.get(_this.financialServerUrl + '/predict?sd=' + startDate + '&ed=' + endDate);
     }
+    
+    var comsumptionCapacityByDate = function(date) {
+      return $http.get(_this.financialServerUrl + '/predict/coms-cap?date=' + date);
+    }
 
-    var canHasTransaction = function(transaction) {
-      return $http.put(_this.financialServerUrl + '/predict/trans', transaction);
+    var canHasTransaction = function(transactions) {
+      return $http.put(_this.financialServerUrl + '/predict/trans', transactions);
     }
 
     /* Recurring Payment */
@@ -131,7 +135,8 @@
       getAccountsNotCreditCard: getAccountsNotCreditCard,
       getSettings: getSettings,
       updateSettings: updateSettings,
-      canHasTransaction: canHasTransaction
+      canHasTransaction: canHasTransaction,
+      comsumptionCapacityByDate: comsumptionCapacityByDate
     }
   }])
 })();

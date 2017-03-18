@@ -31,8 +31,8 @@ module.exports.dateString = function(date, flag){
     return date.format('MM/DD/YYYY');
 }
 
-module.exports.timeDiff = function(startTime, endTime, unit) {
-  return dateValidator(endTime).diff(startTime, unit);
+module.exports.timeUsage = function(startTime, endTime, unit) {
+  console.info("Time Usage: " + dateValidator(endTime).diff(startTime, unit));
 }
 
 module.exports.nextPostedDay = function(date) {

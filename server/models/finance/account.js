@@ -13,18 +13,10 @@ var AccountSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  dueDate: {
-    type: Date
-  },
-  closingDate: {
-    type: Date
-  },
-  creditLine: {
-    type: Number
-  },
-  minPayment: {
-    type: Number
-  },
+  dueDate: Number,
+  closingDate: Number,
+  creditLine: Number,
+  minPayment: Number,
   pendingTransactions: [],
   balance: {
     type: Number,

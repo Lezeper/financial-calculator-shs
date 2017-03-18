@@ -1,17 +1,6 @@
 var mongoose = require('mongoose');
-
+mongoose.Promise = require('bluebird');
 var RewardRule = mongoose.model('RewardRule');
-
-module.exports.getRewardRulesReq = function(req, res) {
-  RewardRule.find({}, function(err,rewardRules){
-    if(err)
-      return res.status(500).send(err);
-    res.status(200).send({
-      msg: "RewardRules Found.",
-      data: rewardRules
-    });
-  });
-}
 
 var addRewardRule = function(rewardRule) {
   var _rewardRule = new RewardRule();
@@ -24,6 +13,17 @@ var addRewardRule = function(rewardRule) {
   _rewardRule.rewardStrategy = rewardRule.rewardStrategy;
 
   return _rewardRule.save();
+}
+
+module.exports.getRewardRulesReq = function(req, res) {
+  RewardRule.find({}, function(err,rewardRules){
+    if(err)
+      return res.status(500).send(err);
+    res.status(200).send({
+      msg: "RewardRules Found.",
+      data: rewardRules
+    });
+  });
 }
 
 module.exports.addRewardRule = function(rewardRule) {

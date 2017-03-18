@@ -1,15 +1,10 @@
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var AccountDefault = mongoose.model('AccountDefault');
 var rewardRuleCtrl = require('./reward-rule');
 
 var getAccountDefault = function() {
-  return new Promise(function(resolve, reject){
-    AccountDefault.find().populate('rewardRules').exec(function(err, accountDefaults){
-      if(err)
-        reject(err);
-      resolve(accountDefaults);
-    });
-  });
+  return AccountDefault.find().populate('rewardRules').exec();
 }
 
 module.exports.getAccountDefault = getAccountDefault;
@@ -20,7 +15,8 @@ module.exports.getAccountDefaultReq = function(req, res) {
       msg: "Account Default Found.",
       data: accountDefaults
     });
-  }, function(err){
+  })
+  .catch(function(err){
     res.status(500).send(err);
   });
 }
