@@ -46,8 +46,15 @@ var isPayRecurringDate = function(currentDate, recurringPayment) {
         return true;
     }
   }
+  if(recurringPayment.recurringPeriod === '2weeks') {
+    var payDate = UtilCtrl.dateFormat(tempRecurringtDate, 'dddd').subtract(recurringPayment.payAhead, 'days');    
+    if(payDate.format('dddd') === currentDate.format('dddd') 
+      && UtilCtrl.isTargetDateBetween(recurringPayment.startDate, recurringPayment.endDate, currentDate)
+      && (currentDate.week()*1 % 2 == 0)) {
+        return true;
+    }
+  }
   return false;
-  
 }
 
 var getFullDueAndClosingDate = function(account, latestAccountsInfoDate) {
@@ -292,7 +299,7 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
   // initial data here and will return those back
   var statements = []; // properties: date, accountsDetails, transactions
   var events = []; // date and status
-  var financeDangerDate = [];
+  var financeDangerDateList = [];
   lowestBalanceAccounts = new Map(); // {_id, balance}
   currentFinanceSafe = true; // no negative balance on checking or saving account
 
@@ -400,7 +407,7 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
         financeStatus = "cal-finance-safe";
       } else {
         financeStatus = "cal-finance-warning";
-        financeDangerDate.push(UtilCtrl.dateString(currentCalculatingDate, 1));
+        financeDangerDateList.push(UtilCtrl.dateString(currentCalculatingDate, 1));
       }
       events.push({date: UtilCtrl.dateString(currentCalculatingDate, 1), financeStatus: financeStatus});
     }
@@ -419,9 +426,8 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
 
   var result = UtilCtrl.clone({
     events: events,
-    financeDangerDate: financeDangerDate,
+    financeDangerDateList: financeDangerDateList,
     statements: statements,
-    // lowestBalanceAccounts: lowestBalanceAccounts
     lowestBalanceInAccountList: lowestBalanceInAccountList
   });
   
@@ -446,7 +452,7 @@ var canHasTransaction = function(addTransaction, startDate, endDate, latestAccou
 
     var predictResult = UtilCtrl.clone(doFinancialPredict(startDate, endDate, latestAccountsInfoTemp, transactionsTemp, recurringPaymentsTemp));
     
-    if(predictResult.financeDangerDate.length == 0) {
+    if(predictResult.financeDangerDateList.length == 0) {
       avaliableAccounts.push(UtilCtrl.clone({
         // can use this account to pay this transaction
         avaliableAccount: account,
@@ -556,6 +562,44 @@ module.exports.canHasTransactionReq = function(req, res) {
       res.status(200).send(canHasTransaction(transaction, startDate, endDate, resData[0], resData[1], resData[2]));
     });
   }
+}
+
+module.exports.salaryNeedForPlan = function(req, res) {
+  getDataPromiseForCalculate().then(function(resData){
+    var latestAccountsInfo = resData[0];
+    var transactions = resData[1];
+    var recurringPayments = resData[2];
+
+    var startDate = req.body.startDate;
+    var endDate = req.body.endDate;
+    var depositAccountId = req.body.depositAccountId;
+    // salary init info, it is a recurring transaction
+    var payroll = {
+      type: "Credit",
+      category: "Salary",
+      description: "Salary",
+      recurringPeriod: "2weeks",
+      recurringDate: "Friday",
+      amount: 0,
+      payAhead: 0,
+      payBy: depositAccountId,
+      startDate: startDate,
+      endDate: endDate
+    };
+
+    var predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, recurringPayments);
+    if(predictResult.financeDangerDateList.length == 0)
+      rese.status(200).send({msg: "Don't need a job..."});
+
+    while(predictResult.financeDangerDateList.length > 0) {
+      payroll.amount = payroll.amount + predictResult.lowestBalanceInAccountList[0].balance;
+      var tempReucrringPayments = UtilCtrl.clone(resData[2]);
+      tempReucrringPayments.push(payroll);
+      predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, tempReucrringPayments);
+    }
+    console.log("Need salary: " + (payroll.amount * 24));
+    res.status(200).send();
+  });
 }
 
 module.exports.doFinancialPredict = function(req, res) {

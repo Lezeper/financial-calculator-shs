@@ -8,7 +8,8 @@ var SettingsSchema = new mongoose.Schema({
   transactionCategory: {
     type: [String],
     default: []
-  }
+  },
+  dbVersion: String
 });
 
 mongoose.model('Settings', SettingsSchema);

@@ -4,6 +4,7 @@
     var _this = this;
     _this.settings;
     _this.canTransaction;
+    _this.backupDBVersion;
 
     meanData.getSettings().then(function(res){
       _this.settings = res.data.data[0];
@@ -30,6 +31,22 @@
       meanData.comsumptionCapacityByDate(date).then(function(res){
 
       });
+    }
+
+    _this.backupDB = function() {
+      if(_this.settings._id) {
+        meanData.backUpDB(_this.settings._id).then(function(res){
+          console.log(res);
+        });
+      }
+    }
+
+    _this.restoreDB = function() {
+      if(_this.settings._id) {
+        meanData.restoreDB(_this.settings._id).then(function(res){
+          console.log(res);
+        });
+      }
     }
   }]);
 })();

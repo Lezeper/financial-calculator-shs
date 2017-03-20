@@ -10,7 +10,8 @@ var settingsCtrl = require('../controllers/finance/settings');
 
 router.get('/predict?', predictionCtrl.doFinancialPredict);
 router.get('/predict/coms-cap', predictionCtrl.comsumptionCapacityByDateReq);
-router.put('/predict/trans', predictionCtrl.canHasTransactionReq);
+router.put('/predict/trans-perm', predictionCtrl.canHasTransactionReq);
+router.put('/predict/salary-need', predictionCtrl.salaryNeedForPlan);
 /* Recurring Payment */
 router.get('/recurring?', recurringCtrl.getRecurringPaymentsReq);
 router.post('/recurring', recurringCtrl.addRecurringPaymentReq);
@@ -38,6 +39,8 @@ router.put('/reward-rule', rewardRuleCtrl.updateRewardRuleReq);
 router.delete('/reward-rule/:id', rewardRuleCtrl.deleteRewardRuleReq);
 /* Settings */
 router.get('/settings?', settingsCtrl.getSettingsReq);
+router.put('/settings/db-backup?', settingsCtrl.backupDB);
+router.put('/settings/db-restore?', settingsCtrl.restoreDB);
 router.put('/settings', settingsCtrl.updateSettingsReq);
 
 module.exports = router;

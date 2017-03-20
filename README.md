@@ -24,7 +24,8 @@
 #### Financial Prediction (/finance)
         GET     /predict?sd=&ed=         - Do financial prediction
         GET     /predict/coms-cap?date   - Comsumption capability
-        PUT     /predict/trans           - Can I have those transactions
+        PUT     /predict/trans-perm      - Can I have those transactions
+        PUT     /predict/salary-need     - Salary need for current plan
         GET     /recurring               - Get All recurring payments
         POST    /recurring               - Add recurring payment
         PUT     /recurring               - Update recurring payment
@@ -45,6 +46,8 @@
         POST    /reward-rule
         DELETE  /reward-rule/:id
         GET     /settings?need
+        PUT     /settings/db-backup?
+        PUT     /settings/db-restore?
         PUT     /settings        
 ## DB Model (Model Name)
 #### Statement (Statement)
@@ -55,7 +58,7 @@
         type: String ("Credit", "Debit")
         category: String
         description: String
-        recurringPeriod: String ("days", "months", "weeks")
+        recurringPeriod: String ("days", "months", "weeks", "2weeks")
         recurringDate: String ("1", "Saturday")
         amount: Number
         payAhead: Number
@@ -105,6 +108,7 @@
 #### Settings (Settings)
         accountConfirmDate: Date
         transactionCategory: [String]
+        dbVersion: String
 ## Terminology
         Accounts: credit card, checking, saving, cash
         AccountsDetails/AccountInfo: without updated date/with upated date
