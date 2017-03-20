@@ -58,13 +58,13 @@ var getFullDueAndClosingDate = function(account, latestAccountsInfoDate) {
   var fullClosingDate = UtilCtrl.dateValidator(latestAccountsInfoDate.format('MM') + "/" 
           + closingDate + "/" + latestAccountsInfoDate.format('YYYY'));
 
-  if(latestAccountsInfoDate.diff(fullDueDate, 'days') > 0) {
+  if(latestAccountsInfoDate.diff(fullDueDate, 'days') >= 0) {
     account.dueDate = UtilCtrl.clone(fullDueDate).add(1, 'month');
   } else {
     account.dueDate = fullDueDate;
   }
 
-  if(latestAccountsInfoDate.diff(fullClosingDate, 'days') > 0) {
+  if(latestAccountsInfoDate.diff(fullClosingDate, 'days') >= 0) {
     account.closingDate = UtilCtrl.clone(fullClosingDate).add(1, 'month');
   } else {
     account.closingDate = fullClosingDate;
@@ -266,23 +266,30 @@ var convertPendingToBlance = function(accounts, currentDate) {
 
     // go through each pending transactions
     var removedPending = [];
+    var tempDate;
     for(var i = 0; i < account.pendingTransactions.length; i++){
-      var tempDate = UtilCtrl.nextPostedDay(UtilCtrl.clone(UtilCtrl.dateValidator(account.pendingTransactions[i].date)));
+      if(account.pendingTransactions[i].category == 'Payment') {
+        // pending transaction only take 1 business day.
+        tempDate = UtilCtrl.nextBusinessDay(UtilCtrl.clone(UtilCtrl.dateValidator(account.pendingTransactions[i].date)));
+      } else {
+        tempDate = UtilCtrl.nextPostedDay(UtilCtrl.clone(UtilCtrl.dateValidator(account.pendingTransactions[i].date)));
+      }
       // if time is matched
-      var t = currentDate.diff(tempDate, 'days') >= 0;
       if(currentDate.diff(tempDate, 'days') >= 0){
         account.balance = updateByAccountType(account, account.pendingTransactions[i].type, account.balance, account.pendingTransactions[i].amount);
         account.changed = addChanged(account, account.pendingTransactions[i].type, account.changed, account.pendingTransactions[i].amount);
         removedPending.push(i);
-        
-        // calculate rewards after pending convert to balance
-        categoryRewardCalculator(account, account.pendingTransactions[i], currentDate);
+        if(account.pendingTransactions[i].category != 'Payment') {
+          // calculate rewards after pending convert to balance
+          categoryRewardCalculator(account, account.pendingTransactions[i], currentDate);
+        }
       }
     }
+    
     if(removedPending.length > 0) {
       // remove from back then it will not effect index
-      for(var j = removedPending.length; j >= 0; j--){
-        account.pendingTransactions.splice(removedPending[j--], 1);
+      for(var j = removedPending.length-1; j >= 0; j--){
+        account.pendingTransactions.splice(removedPending[j], 1);
       }
     }
   });
@@ -432,7 +439,6 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
 var canHasTransaction = function(addTransaction, startDate, endDate, latestAccountsInfo, transactions, recurringPayments) {
   // [{avaliableAccount}, [lowestBalanceInAccountList], [statements]]
   var avaliableAccounts = [];
-  var beginTimer = new Date();
 
   latestAccountsInfo.accountsDetails.forEach(function(account){
     var addTransactionTemp = UtilCtrl.clone(addTransaction);
@@ -456,7 +462,6 @@ var canHasTransaction = function(addTransaction, startDate, endDate, latestAccou
       }));
     }
   });
-  UtilCtrl.timeUsage(beginTimer, new Date(), 'ms');
   return avaliableAccounts;
 }
 
@@ -464,68 +469,29 @@ module.exports.comsumptionCapacityByDateReq = function(req, res) {
   var date = UtilCtrl.getCurrentDate().add(1, 'day');
   var endDate = UtilCtrl.getCurrentDate().add(2, 'months');
   var beginTimer = UtilCtrl.getCurrentDate();
-  var startAmount = 0;
   var endAmount = 1;
 
   if(!_.isNil(date)){
     getDataPromiseForCalculate().then(function(resData){
-      /* Get a decent amount Start */
-      var transaction3 = {
+      var transaction = {
           amount: endAmount,
           date: date,
           category: '',
           type: "Debit",
           payBy: null
       };
-      var tempResult = canHasTransaction(transaction3, date, endDate, resData[0], resData[1], resData[2]);
+      var tempResult = canHasTransaction(transaction, date, endDate, resData[0], resData[1], resData[2]);
       if(tempResult.length === 0)
         return res.status(200).send({balance: 0});
-
-      while(tempResult.length > 0) {
-        startAmount = UtilCtrl.clone(transaction3.amount);
-
-        transaction3.amount = transaction3.amount + tempResult[0].lowestBalanceInAccountList[0].balance;
-        endAmount = transaction3.amount;
-
-        tempResult = canHasTransaction(transaction3, date, endDate, resData[0], resData[1], resData[2]);
-      };
-       /* Get a decent amount End */
-      var middleAmount = (startAmount + endAmount) / 2;
-      
-      while(true) {
-        var transaction1 = {
-          amount: startAmount,
-          date: date,
-          category: '',
-          type: "Debit",
-          payBy: null
-        };
-        var transaction2 = {
-          amount: middleAmount,
-          date: date,
-          category: '',
-          type: "Debit",
-          payBy: null
-        };
-
-        var result1 = canHasTransaction(transaction1, date, endDate, resData[0], resData[1], resData[2]);
-        var result2 = canHasTransaction(transaction2, date, endDate, resData[0], resData[1], resData[2]);
         
-        if(result1.length > 0 && result2.length > 0) {
-          startAmount = middleAmount;
-          middleAmount = (startAmount + endAmount) / 2;
-        }
-        if(result1.length > 0 && result2.length == 0) {
-          endAmount = middleAmount;
-          middleAmount = (startAmount + endAmount) / 2;
-        }
-        if((result1.length == 0 && result2.length == 0) || (Math.floor(startAmount) === Math.floor(endAmount))) {
-          break;
-        }
-      }
-      console.log("Result: " + Math.floor(startAmount) + " | " + endAmount);
+      while(tempResult.length > 0) {
+        transaction.amount = transaction.amount + tempResult[0].lowestBalanceInAccountList[0].balance;
+        endAmount = transaction.amount;
+        tempResult = canHasTransaction(transaction, date, endDate, resData[0], resData[1], resData[2]);
+      };
+      console.log("Result: " + endAmount);
       console.log("Total time: " + UtilCtrl.getCurrentDate().diff(beginTimer, 'ms'));
-      res.status(200).send({balance: Math.floor(startAmount)});
+      res.status(200).send({balance: endAmount});
     });
   }
 }
@@ -564,7 +530,6 @@ module.exports.doFinancialPredict = function(req, res) {
       var latestAccountsInfo = resData[0];
       var transactions = resData[1];
       var recurringPayments = resData[2];
-      
       var result = doFinancialPredict(req.query.sd, req.query.ed, latestAccountsInfo, transactions, recurringPayments);
 
       res.status(200).send(result);

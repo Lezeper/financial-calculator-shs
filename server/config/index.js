@@ -1,7 +1,7 @@
 var username = "ledzeper";
 var password = "123";
 var databaseName = "shs";
-var hosting = "localhost";
+var hosting = "ras3";
 
 module.exports = {
 	"username": username,

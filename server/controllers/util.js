@@ -46,6 +46,17 @@ module.exports.nextPostedDay = function(date) {
   }
 }
 
+module.exports.nextBusinessDay = function(date) {
+  date = dateValidator(date);
+  if(date.format('dddd') === 'Friday') {
+    return date.add(3, 'days');
+  } else if(date.format('dddd') === 'Saturday'){
+    return date.add(2, 'days');
+  } else {
+    return date.add(1, 'days');
+  }
+}
+
 module.exports.removeSpace = function(str) {
   return str.replace(/\s+/g, '');
 }

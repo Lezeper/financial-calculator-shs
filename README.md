@@ -20,6 +20,7 @@
         moment.js
         MongoDB 3.2.5
         lodash 4.17.4
+        pm2
 ## REST Api (/rest)
 #### Financial Prediction (/finance)
         GET     /predict?sd=&ed=         - Do financial prediction
@@ -139,7 +140,6 @@
         direct deposit center
         loading page
         pending show change
-        can I spend $XX on XX?
         how much rates I need to have?
         use reward to pay options
         change use accountname + card# as name and key

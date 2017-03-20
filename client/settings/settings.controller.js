@@ -28,7 +28,7 @@
     _this.comsumptionCapacityByDate = function(date) {
       date = moment().add(1, 'day');
       meanData.comsumptionCapacityByDate(date).then(function(res){
-
+        console.log(res.data.time)
       });
     }
   }]);
