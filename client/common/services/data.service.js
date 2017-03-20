@@ -15,7 +15,11 @@
     }
 
     var canHasTransaction = function(transactions) {
-      return $http.put(_this.financialServerUrl + '/predict/trans', transactions);
+      return $http.put(_this.financialServerUrl + '/predict/trans-perm', transactions);
+    }
+
+    var salaryNeedForPlan = function(plan) {
+      return $http.put(_this.financialServerUrl + '/predict/salary-need', plan);
     }
 
     /* Recurring Payment */
@@ -112,6 +116,14 @@
       return $http.put(_this.financialServerUrl + '/settings', settings);
     }
 
+    var backUpDB = function(id) {
+      return $http.put(_this.financialServerUrl + '/settings/db-backup?id=' + id);
+    }
+
+    var restoreDB = function(id) {
+      return $http.put(_this.financialServerUrl + '/settings/db-restore?id=' + id);
+    }
+
     return {
       doFinancialPrediction: doFinancialPrediction,
       getRecurringPayments: getRecurringPayments,
@@ -136,7 +148,10 @@
       getSettings: getSettings,
       updateSettings: updateSettings,
       canHasTransaction: canHasTransaction,
-      comsumptionCapacityByDate: comsumptionCapacityByDate
+      comsumptionCapacityByDate: comsumptionCapacityByDate,
+      salaryNeedForPlan: salaryNeedForPlan,
+      backUpDB: backUpDB,
+      restoreDB: restoreDB
     }
   }])
 })();

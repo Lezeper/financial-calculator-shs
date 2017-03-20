@@ -70,3 +70,17 @@
 </div>
 <hr>
 <button ng-click="Settings.comsumptionCapacityByDate()">Click</button>
+
+<div class="page-header">
+  <h3>DB Backup and Restore</h3>
+</div>
+<form class="form-horizontal">
+  <div class="form-group">
+    <label class="label-control">Backup DB version</label>
+    <p ng-bind="Settings.backupDBVersion"></p>
+  </div>
+  <div class="form-group">
+    <buttton class="btn btn-primary" ng-click="Settings.backupDB()">Backup</buttton>
+    <buttton class="btn btn-warning" ng-click="Settings.restoreDB()">Restore</buttton>
+  </div>
+</form>

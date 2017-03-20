@@ -2,12 +2,29 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var Settings = mongoose.model('Settings');
 var _ = require('lodash');
+var Path = require('path');
+var config = require('../../config');
+var exec = require('child_process').exec;
 
 var getSettings = function(need){
   need = _.isNil(need) || need === 'undefined' ? {} : need;
 
   return Settings.find({}, need).limit(1).exec();
 }
+
+var deleteFolderRecursive = function(path) {
+  if( fs.existsSync(path) ) {
+    fs.readdirSync(path).forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
 
 module.exports.getSettings = getSettings;
 
@@ -50,4 +67,41 @@ module.exports.updateSettingsReq = function(req, res) {
       res.status(500).send(err);
     });
   }
+}
+
+module.exports.backupDB = function(req, res) {
+	var date = new Date().toJSON();
+	var cmd = 'mongodump -h ' + config.hosting + ' -d ' + config.databaseName 
+	                    + ' -u ' + config.username + ' -p ' + config.password 
+	                          + ' -o DB_Backup/' + date;
+
+	deleteFolderRecursive(Path.join(__dirname, '../../../DB_Backup'));
+
+  consol.log(req.query.id)
+	exec(cmd, function(error, stdout, stderr) {
+		Settings.findOneAndUpdate({_id: req.query.id}, {dbVersion: date}, function(err, settings){
+      if(err)
+        return res.status(500).send(err);
+      res.status(200).send({
+        msg: "DB Backup.",
+        data: settings
+      });
+    });
+	});
+}
+
+module.exports.restoreDB = function(req, res) {
+  getSettings().then(function(settings){
+    if(_.isNil(settings.dbVersion))
+      return res.status(500).send();
+      
+    var cmd = 'mongorestore -h ' + config.hosting + ' -d ' + config.databaseName 
+	                    + ' -u ' + config.username + ' -p ' + config.password 
+	                          + ' -o DB_Backup/' + settings.dbVersion;
+    exec(cmd, function(error, stdout, stderr) {
+      res.status(200).send({
+        msg: "DB Restored."
+      });
+    });
+  });
 }
