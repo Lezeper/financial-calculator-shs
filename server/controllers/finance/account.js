@@ -55,6 +55,7 @@ module.exports.addAccountReq = function(req, res) {
   var account = new Account();
   account.updatedDate = new Date();
   account.accountName = req.body.accountName;
+  account.last4Num = req.body.last4Num;
   account.type = req.body.type;
   account.dueDate = req.body.dueDate;
   account.closingDate = req.body.closingDate;

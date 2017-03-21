@@ -177,7 +177,15 @@ var findAccountAndUpdateBalance = function(transaction, accounts, currentCalcula
           currentFinanceSafe = false;
         // categoryRewardCalculator(account, transaction, currentCalculatingDate);
       }
-      if(account.balance <= 0){
+      // if gift card run out of balance, then use other account to pay
+      if(account.type === UtilCtrl.accountType('gift') && account.balance < 0) {
+        var payExtra = UtilCtrl.clone(account.balance);
+        account = UtilCtrl.clone(account.payBy);
+        account.balance = account.balance - payExtra;
+      }
+      
+      if(account.balance <= 0 && account.type !== UtilCtrl.accountType('gift') &&
+          account.type !== UtilCtrl.accountType('cc')){
         currentFinanceSafe = false;
       }
       account.changed = addChanged(account, transaction.type, account.changed, transaction.amount);
@@ -304,7 +312,7 @@ var convertPendingToBlance = function(accounts, currentDate) {
   });
 }
 
-var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transactions, recurringPayments) {
+var calculateBudget = function(startDate, endDate, latestAccountsInfo, transactions, recurringPayments) {
   // initial data here and will return those back
   var statements = []; // properties: date, accountsDetails, transactions
   var events = []; // date and status
@@ -444,29 +452,29 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
 }
 
 // make sure date format is moment object
-var canHasTransaction = function(addTransaction, startDate, endDate, latestAccountsInfo, transactions, recurringPayments) {
+var canHasTransaction = function(newTran, startDate, endDate, latestAccountsInfo, transactions, recurringPayments) {
   // [{avaliableAccount}, [lowestBalanceInAccountList], [statements]]
   var avaliableAccounts = [];
 
   latestAccountsInfo.accountsDetails.forEach(function(account){
-    var addTransactionTemp = UtilCtrl.clone(addTransaction);
+    var newTranTemp = UtilCtrl.clone(newTran);
     var latestAccountsInfoTemp = latestAccountsInfo;
     var transactionsTemp = UtilCtrl.clone(transactions);
     var recurringPaymentsTemp = recurringPayments;
     
-    addTransactionTemp.payBy = {accountName: account.accountName, balance: account.balance, _id: account._id};
+    newTranTemp.payBy = {accountName: account.accountName, balance: account.balance, _id: account._id};
     
-    transactionsTemp.push(addTransactionTemp);
+    transactionsTemp.push(newTranTemp);
 
-    var predictResult = UtilCtrl.clone(doFinancialPredict(startDate, endDate, latestAccountsInfoTemp, transactionsTemp, recurringPaymentsTemp));
+    var budgetResult = UtilCtrl.clone(calculateBudget(startDate, endDate, latestAccountsInfoTemp, transactionsTemp, recurringPaymentsTemp));
     
-    if(predictResult.financeDangerDateList.length == 0) {
+    if(budgetResult.financeDangerDateList.length == 0) {
       avaliableAccounts.push(UtilCtrl.clone({
         // can use this account to pay this transaction
         avaliableAccount: account,
         // lowest balance for all non-cc account (checking, saving, cash) if the account balance have changed.
-        lowestBalanceInAccountList: predictResult.lowestBalanceInAccountList,
-        statements: predictResult.statements
+        lowestBalanceInAccountList: budgetResult.lowestBalanceInAccountList,
+        statements: budgetResult.statements
       }));
     }
   });
@@ -481,21 +489,28 @@ module.exports.comsumptionCapacityByDateReq = function(req, res) {
 
   if(!_.isNil(date)){
     getDataPromiseForCalculate().then(function(resData){
-      var transaction = {
+      var newTran = {
           amount: endAmount,
           date: date,
           category: '',
           type: "Debit",
           payBy: null
       };
-      var tempResult = canHasTransaction(transaction, date, endDate, resData[0], resData[1], resData[2]);
+      var tempResult = canHasTransaction(newTran, date, endDate, resData[0], resData[1], resData[2]);
       if(tempResult.length === 0)
         return res.status(200).send({balance: 0});
         
       while(tempResult.length > 0) {
-        transaction.amount = transaction.amount + tempResult[0].lowestBalanceInAccountList[0].balance;
-        endAmount = transaction.amount;
-        tempResult = canHasTransaction(transaction, date, endDate, resData[0], resData[1], resData[2]);
+        var lowestBalance = tempResult[0].lowestBalanceInAccountList[0].balance;
+        tempResult.forEach(function(temp){
+          temp.lowestBalanceInAccountList.forEach(function(lowestBalanceInAccount){
+            if(lowestBalance > lowestBalanceInAccount.balance)
+              lowestBalance = lowestBalanceInAccount.balance;
+          });
+        });
+        newTran.amount = newTran.amount + lowestBalance;
+        endAmount = newTran.amount;
+        tempResult = canHasTransaction(newTran, date, endDate, resData[0], resData[1], resData[2]);
       };
       console.log("Total time: " + UtilCtrl.getCurrentDate().diff(beginTimer, 'ms'));
       res.status(200).send({balance: endAmount});
@@ -553,24 +568,24 @@ module.exports.salaryNeedForPlan = function(req, res) {
       startDate: "11/11/1111",
       endDate: "09/09/9999"
     };
-
-    var predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, recurringPayments.push(payroll));
+    recurringPayments.push(payroll);
+    var budgetResult = calculateBudget(startDate, endDate, latestAccountsInfo, transactions, recurringPayments);
     
-    if(predictResult.financeDangerDateList.length == 0){
+    if(budgetResult.financeDangerDateList.length == 0){
       console.log("Don't need a job.")
       return res.status(200).send({msg: "Don't need a job..."});
     }
-      
 
     // var max = 50;
-    // while(predictResult.financeDangerDateList.length > 0 && max-- > 0 ) {
-    //   payroll.amount = payroll.amount - predictResult.lowestBalanceInAccountList[0].balance;
+    // while(budgetResult.financeDangerDateList.length > 0 && max-- > 0 ) {
+    //   payroll.amount = payroll.amount - budgetResult.lowestBalanceInAccountList[0].balance;
     //   var tempReucrringPayments = UtilCtrl.clone(resData[2]);
     //   tempReucrringPayments.push(payroll);
-    //   predictResult = UtilCtrl.clone(doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, tempReucrringPayments));
+    //   predictResult = UtilCtrl.clone(calculateBudget(startDate, endDate, latestAccountsInfo, transactions, tempReucrringPayments));
       
     //   console.log(payroll.amount)
     // }
+
     console.log("Need salary: " + (payroll.amount * 24));
     res.status(200).send({
       data: (payroll.amount * 24)
@@ -578,13 +593,13 @@ module.exports.salaryNeedForPlan = function(req, res) {
   });
 }
 
-module.exports.doFinancialPredict = function(req, res) {
+module.exports.calculateBudget = function(req, res) {
   if(!_.isNil(req.query.sd) && !_.isNil(req.query.ed)) {
     getDataPromiseForCalculate().then(function(resData){
       var latestAccountsInfo = resData[0];
       var transactions = resData[1];
       var recurringPayments = resData[2];
-      var result = doFinancialPredict(req.query.sd, req.query.ed, latestAccountsInfo, transactions, recurringPayments);
+      var result = calculateBudget(req.query.sd, req.query.ed, latestAccountsInfo, transactions, recurringPayments);
 
       res.status(200).send(result);
     });

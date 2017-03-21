@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var predictionCtrl = require('../controllers/finance/financial-prediction');
+var budgetCtrl = require('../controllers/finance/budget');
 var recurringCtrl = require('../controllers/finance/recurring');
 var transactionCtrl = require('../controllers/finance/transaction');
 var AccountCtrl = require('../controllers/finance/account');
@@ -8,10 +8,10 @@ var accountDefaultCtrl = require('../controllers/finance/account-default');
 var rewardRuleCtrl = require('../controllers/finance/reward-rule');
 var settingsCtrl = require('../controllers/finance/settings');
 
-router.get('/predict?', predictionCtrl.doFinancialPredict);
-router.get('/predict/coms-cap', predictionCtrl.comsumptionCapacityByDateReq);
-router.put('/predict/trans-perm', predictionCtrl.canHasTransactionReq);
-router.put('/predict/salary-need', predictionCtrl.salaryNeedForPlan);
+router.get('/budget?', budgetCtrl.calculateBudget);
+router.get('/budget/coms-cap', budgetCtrl.comsumptionCapacityByDateReq);
+router.put('/budget/trans-perm', budgetCtrl.canHasTransactionReq);
+router.put('/budget/salary-need', budgetCtrl.salaryNeedForPlan);
 /* Recurring Payment */
 router.get('/recurring?', recurringCtrl.getRecurringPaymentsReq);
 router.post('/recurring', recurringCtrl.addRecurringPaymentReq);

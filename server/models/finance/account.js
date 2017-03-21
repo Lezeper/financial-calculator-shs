@@ -9,6 +9,10 @@ var AccountSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  last4Num: {
+    type: Number,
+    required: true
+  },
   type: {
     type: String,
     required: true

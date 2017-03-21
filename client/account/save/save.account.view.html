@@ -18,6 +18,18 @@
                 </div>
             </div>
         </div>
+        <div class="form-group" ng-if="!SaveAccount.account">
+            <label class="control-label col-sm-2">Last 4 Account #</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input type="number" class="form-control" ng-model="SaveAccount.nAccount.last4Num" ng-readonly="SaveAccount.saveAccountFlag.last4Num">
+                    <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.last4Num=!SaveAccount.saveAccountFlag.last4Num">
+                        <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.last4Num"></i>
+                        <i class="glyphicon glyphicon-lock" ng-show="!SaveAccount.saveAccountFlag.last4Num"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
         <div ng-if="SaveAccount.account.type === 'CreditCard' || SaveAccount.nAccount.type === 'CreditCard'">
             <div class="form-group">
                 <label class="control-label col-sm-2">Due Date</label>

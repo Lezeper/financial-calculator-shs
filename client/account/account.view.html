@@ -10,6 +10,7 @@
 	<thead>
 		<tr>
 			<th></th>
+			<th>ID</th>
 			<th>Updated</th>
 			<th>Due Date</th>
 			<th>Closing Date</th>
@@ -21,8 +22,11 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="account in Account.accounts">
-			<td class="cursor-hand" ng-click="Account.showAccountModal(account.accountName, account)"><img src="./img/{{account.accountName}}.png" 
-				class="account-thumbnail" alt="{{account.accountName}}" title="{{account.accountName}}"></td>
+			<td class="cursor-hand" ng-click="Account.showAccountModal(account.accountName, account)">
+				<img src="./img/{{account.accountName}}.png" 
+				class="account-thumbnail" alt="{{account.accountName}}" title="{{account.accountName}}">
+			</td>
+			<td>{{account.last4Num}}</td>
 			<td>{{account.updatedDate | date:'MM/dd'}}</td>
 			<td>{{account.dueDate}}</td>
 			<td>{{account.closingDate}}</td>

@@ -7,19 +7,19 @@
     _this.financialServerUrl = '/rest/finance';
 
     var doFinancialPrediction = function(startDate, endDate) {
-      return $http.get(_this.financialServerUrl + '/predict?sd=' + startDate + '&ed=' + endDate);
+      return $http.get(_this.financialServerUrl + '/budget?sd=' + startDate + '&ed=' + endDate);
     }
     
     var comsumptionCapacityByDate = function(date) {
-      return $http.get(_this.financialServerUrl + '/predict/coms-cap?date=' + date);
+      return $http.get(_this.financialServerUrl + '/budget/coms-cap?date=' + date);
     }
 
     var canHasTransaction = function(transactions) {
-      return $http.put(_this.financialServerUrl + '/predict/trans-perm', transactions);
+      return $http.put(_this.financialServerUrl + '/budget/trans-perm', transactions);
     }
 
     var salaryNeedForPlan = function(plan) {
-      return $http.put(_this.financialServerUrl + '/predict/salary-need', plan);
+      return $http.put(_this.financialServerUrl + '/budget/salary-need', plan);
     }
 
     /* Recurring Payment */

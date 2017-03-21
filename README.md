@@ -4,7 +4,7 @@
         Will change to Angular 2 and Angular 2 material when it
         release the final version.
 ## Main Features
-        * Account balance prediction for a period. Remind me what is
+        * Personal budget forecast for a period. Remind me what is
           the lowest balance for each accounts during this period.
         * Calculate purchase category rewards.
         * Determine whether this transaction will crash me. If no,
@@ -23,10 +23,10 @@
         pm2
 ## REST Api (/rest)
 #### Financial Prediction (/finance)
-        GET     /predict?sd=&ed=         - Do financial prediction
-        GET     /predict/coms-cap?date   - Comsumption capability
-        PUT     /predict/trans-perm      - Can I have those transactions
-        PUT     /predict/salary-need     - Salary need for current plan
+        GET     /budget?sd=&ed=         
+        GET     /budget/coms-cap?date    - Comsumption capability
+        PUT     /budget/trans-perm       - Can I have those transactions
+        PUT     /budget/salary-need      - Salary need for current plan
         GET     /recurring               - Get All recurring payments
         POST    /recurring               - Add recurring payment
         PUT     /recurring               - Update recurring payment
@@ -49,7 +49,21 @@
         GET     /settings?need
         PUT     /settings/db-backup?
         PUT     /settings/db-restore?
-        PUT     /settings        
+        PUT     /settings
+## Method
+#### .calculateBudget
+        @param
+        startDate, endDate, latestAccountsInfo, transactions, recurringPayments
+        @return
+        events {[data, financeStatus("cal-finance-safe", "cal-finance-warning")]}
+        financeDangerDateList {["MM/DD/YYYY"]}
+        statements {[date, accountsDetails, transactions]}
+        lowestBalanceInAccountList {[balance, date, accountname, _id]}
+#### .canHasTransaction
+        @param
+        newTran, startDate, endDate, latestAccountsInfo, transactions, recurringPayments
+        @return
+        avaliableAccounts [{avaliableAccount(account), lowestBalanceInAccountList, statements}]
 ## DB Model (Model Name)
 #### Statement (Statement)
         date: Date ("MM/DD/YYYY")
@@ -74,11 +88,11 @@
         date: Date ("MM/DD/YYYY")
         payBy: Account(ObjectId)
         isPending: Boolean
-#### Account  (Account) 17
+#### Account  (Account)
         _id: String
         updatedDate: Date
         accountName: String
-        type: String ("Cash", "Checking", "Saving", "CreditCard")
+        type: String ("Cash", "Checking", "Saving", "CreditCard", "GiftCard")
         dueDate: Date
         closingDate: Date
         creditLine: Number
@@ -126,8 +140,6 @@
         Yes, it will do more job in the front-end for displaying purpose.
         For backend, we assume the date is valid Date or moment object,
         not null or undefined.
-####   Is it support Account with same name?
-        Yes
 ####   Is this application support multiple user?
         No. Currently it is only designed for self-use.
 ####   When should I update my account?
@@ -146,9 +158,9 @@
         pending show change
         how much rates I need to have?
         use reward to pay options
-        change use accountname + card# as name and key
-        if duedate not updated, it will never deducted balance
-        gift card 
+        -> add last 4 num
+        -> gift card
+        take care naming in the front end when rewrite the code
 ## Issue
         1. moment object add/substract method will replace variable.
         But format method will not.
