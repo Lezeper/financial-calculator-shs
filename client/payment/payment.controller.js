@@ -35,12 +35,22 @@
 			});
 		}
 
+		_this.salaryNeedForPlan = function(plan) {
+			meanData.salaryNeedForPlan(plan).then(function(res){
+				plan.result = res.data.data;
+			});
+		}
+
 		meanData.getRecurringPayments().then(function(res){
 			_this.recurringPayments = res.data.data;
 		});
 
 		meanData.getTransactions().then(function(res){
 			_this.transactioins = res.data.data;
+		});
+
+		meanData.getAccountsNotCreditCard().then(function(res){
+			_this.nonCreditCardAccounts = res.data.data;
 		});
 	}]);
 })();

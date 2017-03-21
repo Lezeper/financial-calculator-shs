@@ -5,6 +5,8 @@ var _ = require('lodash');
 var Path = require('path');
 var config = require('../../config');
 var exec = require('child_process').exec;
+var fs = require('fs');
+var UtilCtrl = require('../util');
 
 var getSettings = function(need){
   need = _.isNil(need) || need === 'undefined' ? {} : need;
@@ -70,14 +72,13 @@ module.exports.updateSettingsReq = function(req, res) {
 }
 
 module.exports.backupDB = function(req, res) {
-	var date = new Date().toJSON();
+	var date = UtilCtrl.getCurrentDate();
 	var cmd = 'mongodump -h ' + config.hosting + ' -d ' + config.databaseName 
 	                    + ' -u ' + config.username + ' -p ' + config.password 
 	                          + ' -o DB_Backup/' + date;
 
 	deleteFolderRecursive(Path.join(__dirname, '../../../DB_Backup'));
 
-  consol.log(req.query.id)
 	exec(cmd, function(error, stdout, stderr) {
 		Settings.findOneAndUpdate({_id: req.query.id}, {dbVersion: date}, function(err, settings){
       if(err)
@@ -92,12 +93,14 @@ module.exports.backupDB = function(req, res) {
 
 module.exports.restoreDB = function(req, res) {
   getSettings().then(function(settings){
+    settings = settings[0];
     if(_.isNil(settings.dbVersion))
       return res.status(500).send();
       
     var cmd = 'mongorestore -h ' + config.hosting + ' -d ' + config.databaseName 
 	                    + ' -u ' + config.username + ' -p ' + config.password 
-	                          + ' -o DB_Backup/' + settings.dbVersion;
+	                          + ' DB_Backup/' + settings.dbVersion + "/" + config.databaseName + " --drop";
+                            console.log(cmd);
     exec(cmd, function(error, stdout, stderr) {
       res.status(200).send({
         msg: "DB Restored."

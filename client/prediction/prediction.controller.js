@@ -5,7 +5,7 @@
 		// initial controller level val here...
 		_this.showStatements = false;
 		_this.events;
-		_this.financeDangerDate;
+		_this.financeDangerDateList;
 		_this.statements;
 		_this.calendarDisplayerOptions = {};  // Calendar Settings
 		// ngModel can't handle moment object, so still using Date object here...
@@ -61,7 +61,7 @@
 
 			meanData.doFinancialPrediction(startDate, endDate).then(function(res){
 				_this.events = res.data.events;
-				_this.financeDangerDate = res.data.financeDangerDate;
+				_this.financeDangerDateList = res.data.financeDangerDateList;
 				_this.statements = res.data.statements;
 				_this.lowestBalanceInAccountList = res.data.lowestBalanceInAccountList;
 

@@ -1,3 +1,28 @@
+<!--Salary need for plan-->
+<h4>Salary Need Prediction</h4>
+<label class="label-control">Result: {{plan.result | currency: $ : 2}}</label>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="">Start Date</label>
+		<input type="date" class="form-control" ng-model="plan.startDate">
+	</div>
+	<div class="form-group">
+		<label for="">End Date</label>
+		<input type="date" class="form-control" ng-model="plan.endDate">
+	</div>
+	<div class="form-group">
+		<label for="">DD Account</label>
+		<select class="form-control" ng-model="plan.depositAccountId">
+			<option ng-repeat="ncc in Payment.nonCreditCardAccounts" value="{{ncc._id}}">
+				{{ncc.accountName}}
+			</option>
+		</select>
+	</div>
+	<div class="form-group">
+		<button class="btn btn-success" ng-click="Payment.salaryNeedForPlan(plan)">Calculate</button>
+	</div>
+</form>
+
 <!--One Time Payment-->
 <div id="one-time-payment">
 	<div class="page-header">

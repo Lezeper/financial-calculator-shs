@@ -47,6 +47,8 @@ var isPayRecurringDate = function(currentDate, recurringPayment) {
     }
   }
   if(recurringPayment.recurringPeriod === '2weeks') {
+    
+        console.log(currentDate.format("DD/MM/YYYY"))
     var payDate = UtilCtrl.dateFormat(tempRecurringtDate, 'dddd').subtract(recurringPayment.payAhead, 'days');    
     if(payDate.format('dddd') === currentDate.format('dddd') 
       && UtilCtrl.isTargetDateBetween(recurringPayment.startDate, recurringPayment.endDate, currentDate)
@@ -403,7 +405,7 @@ var doFinancialPredict = function(startDate, endDate, latestAccountsInfo, transa
     }
     currentStatement = {date: UtilCtrl.dateString(currentCalculatingDate, 0), accountsDetails: tempAccountsDetails, 
             transactions: currentTransactions};
-
+    
     // push current statement to statements if there is blance change and after start date
     if (currentCalculatingDate.diff(startDate, 'days') >= 0 && currentTransactions.length > 0){
       statements.push(UtilCtrl.clone(currentStatement));
@@ -495,7 +497,6 @@ module.exports.comsumptionCapacityByDateReq = function(req, res) {
         endAmount = transaction.amount;
         tempResult = canHasTransaction(transaction, date, endDate, resData[0], resData[1], resData[2]);
       };
-      console.log("Result: " + endAmount);
       console.log("Total time: " + UtilCtrl.getCurrentDate().diff(beginTimer, 'ms'));
       res.status(200).send({balance: endAmount});
     });
@@ -544,27 +545,36 @@ module.exports.salaryNeedForPlan = function(req, res) {
       type: "Credit",
       category: "Salary",
       description: "Salary",
-      recurringPeriod: "2weeks",
+      recurringPeriod: "weeks",
       recurringDate: "Friday",
       amount: 0,
       payAhead: 0,
       payBy: depositAccountId,
-      startDate: startDate,
-      endDate: endDate
+      startDate: "11/11/1111",
+      endDate: "09/09/9999"
     };
 
-    var predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, recurringPayments);
-    if(predictResult.financeDangerDateList.length == 0)
-      rese.status(200).send({msg: "Don't need a job..."});
-
-    while(predictResult.financeDangerDateList.length > 0) {
-      payroll.amount = payroll.amount + predictResult.lowestBalanceInAccountList[0].balance;
-      var tempReucrringPayments = UtilCtrl.clone(resData[2]);
-      tempReucrringPayments.push(payroll);
-      predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, tempReucrringPayments);
+    var predictResult = doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, recurringPayments.push(payroll));
+    
+    if(predictResult.financeDangerDateList.length == 0){
+      console.log("Don't need a job.")
+      return res.status(200).send({msg: "Don't need a job..."});
     }
+      
+
+    // var max = 50;
+    // while(predictResult.financeDangerDateList.length > 0 && max-- > 0 ) {
+    //   payroll.amount = payroll.amount - predictResult.lowestBalanceInAccountList[0].balance;
+    //   var tempReucrringPayments = UtilCtrl.clone(resData[2]);
+    //   tempReucrringPayments.push(payroll);
+    //   predictResult = UtilCtrl.clone(doFinancialPredict(startDate, endDate, latestAccountsInfo, transactions, tempReucrringPayments));
+      
+    //   console.log(payroll.amount)
+    // }
     console.log("Need salary: " + (payroll.amount * 24));
-    res.status(200).send();
+    res.status(200).send({
+      data: (payroll.amount * 24)
+    });
   });
 }
 

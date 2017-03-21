@@ -29,14 +29,15 @@
     _this.comsumptionCapacityByDate = function(date) {
       date = moment().add(1, 'day');
       meanData.comsumptionCapacityByDate(date).then(function(res){
-        console.log(res.data.time)
+        _this.settings.comsumptionCapacity = res.data.balance;
       });
     }
 
     _this.backupDB = function() {
       if(_this.settings._id) {
         meanData.backUpDB(_this.settings._id).then(function(res){
-          console.log(res);
+          alert(res.data.msg);
+          $window.location.reload();
         });
       }
     }
@@ -44,7 +45,8 @@
     _this.restoreDB = function() {
       if(_this.settings._id) {
         meanData.restoreDB(_this.settings._id).then(function(res){
-          console.log(res);
+          alert(res.data.msg);
+          $window.location.reload();
         });
       }
     }
