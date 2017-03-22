@@ -149,6 +149,7 @@
         change use accountname + card# as name and key
         if duedate not updated, it will never deducted balance
         gift card 
+        add transaction will modify recurring record
 ## Issue
         1. moment object add/substract method will replace variable.
         But format method will not.

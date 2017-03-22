@@ -39,7 +39,7 @@ module.exports.nextPostedDay = function(date) {
   date = dateValidator(date);
   if(date.format('dddd') === 'Friday') {
     return date.add(4, 'days');
-  } else if(date.format('dddd') === 'Saturday'){
+  } else if(date.format('dddd') === 'Saturday' || date.format('dddd') === 'Sunday'){
     return date.add(3, 'days');
   } else {
     return date.add(2, 'days');
