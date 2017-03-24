@@ -122,7 +122,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="account in st.accountsDetails">
+						<tr ng-repeat="account in st.accountsDetails | orderBy: 'order'">
 							<td><button class="btn-link" ng-click="">{{ account.accountName }}</button></td>
 							<td>{{ account.type }}</td>
 							<td ng-init="Prediction.calculatePending(account)">{{account.pending | currency: "$": 2}}</td>

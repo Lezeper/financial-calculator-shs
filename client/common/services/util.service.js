@@ -1,5 +1,6 @@
 (function(){
   app.service('utilService', [function(){
+		var loading = false;
     // flag -1: return moment object
 		// flag 0: return string; add weekday, 2/17/2017 Tuesday
 		// flag 1: return string; month day year, 2/2/2017
@@ -49,7 +50,8 @@
     return {
       dateFormat: dateFormat,
 			accountType: accountType,
-			transactionType: transactionType
+			transactionType: transactionType,
+			loading: loading
     }
   }]);
 })();

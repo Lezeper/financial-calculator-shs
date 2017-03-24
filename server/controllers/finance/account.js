@@ -55,6 +55,7 @@ module.exports.addAccountReq = function(req, res) {
   var account = new Account();
   account.updatedDate = new Date();
   account.accountName = req.body.accountName;
+  account.last4Num = req.body.last4Num;
   account.type = req.body.type;
   account.dueDate = req.body.dueDate;
   account.closingDate = req.body.closingDate;
@@ -63,6 +64,8 @@ module.exports.addAccountReq = function(req, res) {
   account.lastBalance = req.body.lastBalance;
   account.pendingTransactions = req.body.pendingTransactions;
   account.balance = req.body.balance;
+  account.payBy = req.body.payBy;
+  account.backupPaymentAccount = req.body.backupPaymentAccount;
 
   if(_.isNil(req.body.apr0Valid))
     account.apr0Valid = false;
@@ -75,8 +78,6 @@ module.exports.addAccountReq = function(req, res) {
     account.threshold = 100;
   else
     account.threshold = req.body.threshold;
-  
-  account.payBy = req.body.payBy;
 
   if(req.body.rewardRules.length > 0) {
     req.body.rewardRules.forEach(function(rewardRule){

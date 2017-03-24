@@ -5,8 +5,16 @@ var app = angular.module('app', ['ngRoute', 'ui.bootstrap', 'ngSanitize']);
     $scope.year = new Date().getFullYear();
   }]);
 
-  app.controller('mainCtrl', ['$scope', '$rootScope', function($scope, $rootScope){
+  app.controller('mainCtrl', ['$scope', '$rootScope', 'utilService', 
+    function($scope, $rootScope, utilService){
+        $scope.loading = false;
 
+        $scope.$watch(function(){
+            return utilService.loading;
+        },function(newVal){
+            $scope.loading = newVal;
+            console.log($scope.loading);
+        });
   }]);
 
   app.directive('dateInput', function(){

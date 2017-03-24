@@ -33,6 +33,7 @@ module.exports.addRecurringPaymentReq = function(req, res) {
   recurring.payBy = req.body.payBy;
   recurring.startDate = req.body.startDate;
   recurring.endDate = req.body.endDate;
+  recurring.isPending = req.body.isPending;
 
   recurring.save(function(err, rRecurring){
     if(err)

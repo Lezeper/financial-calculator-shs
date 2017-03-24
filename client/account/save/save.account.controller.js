@@ -17,6 +17,7 @@
                 return;
             _this.saveAccountFlag = {
                 "accountName": bool,
+                "last4Num": bool,
                 "dueDate": bool,
                 "closingDate": bool,
                 "minPayment": bool,
@@ -34,6 +35,7 @@
                 "rewards": bool,
                 "rewardRules": bool,
                 "payBy": bool,
+                "backupPaymentAccount": bool
             };
         }
 

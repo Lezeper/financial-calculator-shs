@@ -9,6 +9,7 @@ var AccountSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  last4Num: Number,
   type: {
     type: String,
     required: true
@@ -41,6 +42,14 @@ var AccountSchema = new mongoose.Schema({
   payBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Account'
+  },
+  backupPaymentAccount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Account'
+  },
+  order: {
+    type: Number,
+    default: 0
   },
   rewards: {
     type: Number,

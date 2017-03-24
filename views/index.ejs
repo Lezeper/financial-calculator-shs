@@ -23,7 +23,10 @@
     <script src="app.min.js"></script>
 </head>
 <body>
-
+<div ng-show="loading" ng-controller="mainCtrl">
+    <div id="loader-container"></div>
+    <div id="loader"></div>
+</div>
 <div class="container">
     <navigation ng-controller="navCtrl"></navigation>
     <div class="row" style="padding: 20px">

@@ -78,6 +78,8 @@ module.exports.accountType = function(type) {
     return 'Checking';
   if(type === 'saving')
     return 'Saving';
+  if(type === 'gift')
+    return 'GiftCard';
 }
 
 module.exports.transactionType = function(type) {

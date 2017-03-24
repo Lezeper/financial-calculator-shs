@@ -34,6 +34,10 @@ var RecurringSchema = new mongoose.Schema({
   endDate: {
     type: Date,
     default: new Date('9/9/9999')
+  },
+  isPending: {
+    type: Boolean,
+    default: true
   }
 });
 
