@@ -232,8 +232,8 @@
             <label class="control-label col-sm-2">Backup Payment Account</label>
             <div class="col-sm-10">
                 <div class="input-group">
-                    <select class="form-control" ng-model="SaveAccount.nAccount.backupPaymentAccount" ng-disabled="SaveAccount.saveAccountFlag.backupPaymentAccount">
-                        <option ng-repeat="adP in SaveAccount.accountDefault" value="{{adP._id}}">{{adP.accountName}}</option>
+                    <select class="form-control" ng-model="SaveAccount.nAccount.backupPaymentAccount._id" ng-disabled="SaveAccount.saveAccountFlag.backupPaymentAccount">
+                        <option ng-repeat="account in SaveAccount.accounts" value="{{account._id}}">{{account.accountName}}</option>
                     </select>
                     <span class="input-group-addon cursor-hand" ng-click="SaveAccount.saveAccountFlag.backupPaymentAccount=!SaveAccount.saveAccountFlag.backupPaymentAccount">
                         <i class="glyphicon glyphicon-pencil" ng-show="SaveAccount.saveAccountFlag.backupPaymentAccount"></i>

@@ -81,7 +81,7 @@ var getFullDueAndClosingDate = function(account, latestAccountsInfoDate) {
 }
 
 var setlowestBalanceAccounts = function(account, currentCalculatingDate) {
-  if(account.balance <= 0)
+  if(account.balance < 0)
     return currentFinanceSafe = false;
   if(lowestBalanceAccounts.has(account._id)){
     if(lowestBalanceAccounts.get(account._id).balance*1 > account.balance){
@@ -184,9 +184,19 @@ var findAccountAndUpdateBalance = function(transaction, accounts, currentCalcula
       }
       // if gift card run out of balance, then use other account to pay
       if(account.type === UtilCtrl.accountType('gift') && account.balance < 0) {
-        var payExtra = UtilCtrl.clone(account.balance);
-        account = UtilCtrl.clone(account.payBy);
-        account.balance = account.balance - payExtra;
+        var payExtra = UtilCtrl.clone(account.balance*-1);
+        transaction.amount = transaction.amount - payExtra;
+        account.balance = 0;
+        var newExtraTransaction = {
+          date: currentCalculatingDate,
+          amount: payExtra,
+          category: transaction.category,
+          description: transaction.description,
+          type: transaction.type,
+          payBy: account.backupPaymentAccount,
+          isPending: true
+        }
+        findAccountAndAddPayment(newExtraTransaction, accounts, currentCalculatingDate);
       }
       
       if(account.balance <= 0 && account.type !== UtilCtrl.accountType('gift') &&
@@ -376,18 +386,20 @@ var calculateBudget = function(startDate, endDate, latestAccountsInfo, transacti
 
     // check whether there is a transaction in this time (one-off payment)
     for (var j = 0; j < transactions.length; j++) {
+      var tempTransaction = UtilCtrl.clone(transactions[j]);
       if(UtilCtrl.dateString(transactions[j].date, 1) === UtilCtrl.dateString(currentCalculatingDate, 1)) {
         findAccountAndAddPayment(transactions[j], tempAccountsDetails, currentCalculatingDate);
-        currentTransactions.push(transactions[j]);
+        currentTransactions.push(tempTransaction);
       }
     }
     
     // check whether have recurring payment in this time
     for (var k = 0; k < recurringPayments.length; k++) {
+      var tempRecurringPayment = UtilCtrl.clone(recurringPayments[k]);
       // if recurring date match current date
       if(isPayRecurringDate(currentCalculatingDate, recurringPayments[k])){
         findAccountAndAddPayment(recurringPayments[k], tempAccountsDetails, currentCalculatingDate);     
-        currentTransactions.push(recurringPayments[k]);
+        currentTransactions.push(tempRecurringPayment);
       }
     }
 

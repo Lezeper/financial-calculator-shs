@@ -17,10 +17,10 @@
 <div class="page-header">
   <h4>Can I spend?</h4>
 </div>
-<form class="form-horizontal">
+<form class="form-horizontal" name="canISpend">
   <div class="form-group">
     <label for="">Amount</label>
-    <input type="number" step="0.01" class="form-control" ng-model="Settings.canTransaction.amount">
+    <input type="number" step="0.01" min="1" class="form-control" ng-model="Settings.canTransaction.amount" required>
   </div>
   <div class="form-group">
     <label for="">Date</label>
@@ -43,7 +43,8 @@
     </select>
   </div>
   <div class="form-group">
-    <button class="btn btn-primary" ng-click="Settings.canHasTransaction(Settings.canTransaction)">Show Me</button>
+    <button class="btn btn-primary" ng-click="Settings.canHasTransaction(Settings.canTransaction)"
+      ng-disabled="canISpend.$invalid">Show Me</button>
   </div>
 </form>
 <hr>

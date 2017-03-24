@@ -125,6 +125,10 @@
         meanData.getAccountsNotCreditCard().then(function(ancc){
             _this.payByAccounts = ancc.data.data;
         });
+        
+        meanData.getAccounts().then(function(accounts){
+            _this.accounts = accounts.data.data.accountsDetails;
+        });
         meanData.getSettings('transactionCategory').then(function(tc){
             _this.transactionCategoryList = tc.data.data[0].transactionCategory;
         });

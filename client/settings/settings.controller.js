@@ -5,7 +5,7 @@
     _this.settings;
     _this.canTransaction;
     _this.backupDBVersion;
-
+    
     meanData.getSettings().then(function(res){
       _this.settings = res.data.data[0];
       _this.settings.accountConfirmDate = new Date(res.data.data[0].accountConfirmDate);

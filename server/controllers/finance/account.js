@@ -7,7 +7,7 @@ var _ = require('lodash');
 
 var getAccounts = function() {
   return new Promise(function(resolve, reject){
-    Account.find().populate('payBy').populate('rewardRules.rule')
+    Account.find().populate('payBy').populate('rewardRules.rule').populate('backupPaymentAccount')
       .exec(function(err, accounts){
       if(err)
         return reject(err);
