@@ -11,11 +11,11 @@
 		<tr>
 			<th></th>
 			<th>ID</th>
-			<th>Updated</th>
 			<th>Due Date</th>
 			<th>Closing Date</th>
 			<th>Last Balance</th>
 			<th>Balance</th>
+			<th>AB</th>
 			<th>PTs</th>
 			<th></th>
 		</tr>
@@ -27,11 +27,11 @@
 				class="account-thumbnail" alt="{{account.accountName}}" title="{{account.accountName}}">
 			</td>
 			<td>{{account.last4Num}}</td>
-			<td>{{account.updatedDate | date:'MM/dd'}}</td>
 			<td>{{account.dueDate}}</td>
 			<td>{{account.closingDate}}</td>
 			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('lastBalance', account.lastBalance, account)">{{account.lastBalance | currency: "$": 2}}</td>
 			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('balance', account.balance, account)">{{account.balance | currency: "$": 2}}</td>
+			<td class="cursor-hand" ng-dblclick="Account.fastUpadteProperty('avaliableBalance', account.avaliableBalance, account)">{{account.avaliableBalance | currency: "$": 2}}</td>
 			<td class="cursor-hand">{{account.pendingTransactions.length}}</td>
 			<td>
 				<button class="btn-link"><i class="glyphicon glyphicon glyphicon-remove"

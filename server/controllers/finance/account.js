@@ -66,6 +66,7 @@ module.exports.addAccountReq = function(req, res) {
   account.balance = req.body.balance;
   account.payBy = req.body.payBy;
   account.backupPaymentAccount = req.body.backupPaymentAccount;
+  account.avaliableBalance = req.body.avaliableBalance;
 
   if(_.isNil(req.body.apr0Valid))
     account.apr0Valid = false;

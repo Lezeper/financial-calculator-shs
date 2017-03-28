@@ -50,20 +50,6 @@
         PUT     /settings/db-backup?
         PUT     /settings/db-restore?
         PUT     /settings
-## Method
-#### .calculateBudget
-        @param
-        startDate, endDate, latestAccountsInfo, transactions, recurringPayments
-        @return
-        events {[data, financeStatus("cal-finance-safe", "cal-finance-warning")]}
-        financeDangerDateList {["MM/DD/YYYY"]}
-        statements {[date, accountsDetails, transactions]}
-        lowestBalanceInAccountList {[balance, date, accountname, _id]}
-#### .canHasTransaction
-        @param
-        newTran, startDate, endDate, latestAccountsInfo, transactions, recurringPayments
-        @return
-        avaliableAccounts [{avaliableAccount(account), lowestBalanceInAccountList, statements}]
 ## DB Model (Model Name)
 #### Statement (Statement)
         date: Date ("MM/DD/YYYY")
@@ -103,6 +89,7 @@
         pendingTransactions: [{description, date, amount, type, 
                 category, (payBy)}]
         balance: Number
+        avaliableBalance: Number
         apr0Valid: Boolean
         apr0Date: {startDate, endDate} {}
         threshold: Number
@@ -163,6 +150,7 @@
         how much rates I need to have?
         use reward to pay options
         add transaction will modify recurring record
+        pending positive negative
 ## Issue
         1. moment object add/substract method will replace variable.
         But format method will not.

@@ -21,11 +21,12 @@
     _this.canHasTransaction = function(transaction){
       utilService.loading = true;
       meanData.canHasTransaction(transaction).then(function(res){
-        if(res.data.length == 0)
-          return alert("You can't has this transaction");
-        _this.avaliableAccounts = res.data;
+        if(res.data.length == 0) {
+          alert("You can't has this transaction");
+        } else {
+          _this.avaliableAccounts = res.data;
+        }
         utilService.loading = false;
-        
       });
     }
 

@@ -1,5 +1,5 @@
-<div class="alert alert-danger" ng-repeat="fdd in Prediction.financeDangerDateList">
-  <strong>Warning!</strong> Finance Crisis on {{fdd}}!
+<div class="alert alert-danger" ng-if="!Prediction.currentFinanceSafe">
+  <strong>Warning!</strong> Finance Crisis...
 </div>
 <div class="page-header">
 	<h3 class="text-center">Statement Prediction</h3>
@@ -142,7 +142,7 @@
 							<!-- AB: Avaliable Balance means suppose you will pay off the last balance, the rest of money you can leave there below the threshold -->
 							<td ng-if="account.type === 'CreditCard'" 
 									ng-init="st.avaliableBalanceSum=(st.avaliableBalanceSum+(account.creditLine * (account.threshold / 100) - account.balance + account.lastBalance))">
-								{{ account.creditLine * (account.threshold / 100) - account.balance + account.lastBalance | currency: "$": 2 }} ({{ account.threshold }}%)
+								{{ account.avaliableBalance | currency: "$": 2 }} ({{ account.threshold }}%)
 							</td>
 							<td ng-if="account.type !== 'CreditCard'" ng-init="st.avaliableBalanceSum=(st.avaliableBalanceSum + (account.balance * (account.threshold / 100)))">
 								{{ account.balance * (account.threshold / 100) | currency: "$": 2 }} ({{ account.threshold }}%)

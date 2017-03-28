@@ -23,6 +23,7 @@ var AccountSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  avaliableBalance: Number,
   lastBalance: {
     type: Number,
     default: 0

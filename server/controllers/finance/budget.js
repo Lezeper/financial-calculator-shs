@@ -174,18 +174,24 @@ var findAccountAndUpdateBalance = function(transaction, accounts, currentCalcula
       account.balance = updateByAccountType(account, transaction.type, account.balance, transaction.amount);
       // TODO: should we remove this? it must be credit to a credit card.
       if(account.type == UtilCtrl.accountType('cc')){
-        var tempPendingTotalBalance = 0;
+        account.avaliableBalance = account.avaliableBalance - transaction.amount;
+        // calculate pending
         account.pendingTransactions.forEach(function(pt){
-          tempPendingTotalBalance = pt.balance + tempPendingTotalBalance;
+          if(pt.type === UtilCtrl.transactionType('debit')) {
+            account.avaliableBalance = account.avaliableBalance - pt.balance;
+          } else if (pt.type === UtilCtrl.transactionType('credit')) {
+            account.avaliableBalance = account.avaliableBalance + pt.balance;
+          }
         });
         // if the credit line is safe...
-        if(account.creditLine <= (account.balance + transaction.amount + tempPendingTotalBalance))
+        if(account.avaliableBalance < 0)
           currentFinanceSafe = false;
       }
+
       // if gift card run out of balance, then use other account to pay
       if(account.type === UtilCtrl.accountType('gift') && account.balance < 0) {
         var payExtra = UtilCtrl.clone(account.balance*-1);
-        transaction.amount = transaction.amount - payExtra;
+        // transaction.amount = transaction.amount - payExtra;
         account.balance = 0;
         var newExtraTransaction = {
           date: currentCalculatingDate,
@@ -220,6 +226,15 @@ var findAccountAndAddPayment = function(transaction, accounts, currentCalculatin
           description: transaction.description,
           type: transaction.type
         }));
+
+        if(accounts[i].type === UtilCtrl.accountType('cc')) {
+          if(transaction.type === UtilCtrl.transactionType('debit'))
+            accounts[i].avaliableBalance = accounts[i].avaliableBalance - transaction.amount;
+          if(transaction.type === UtilCtrl.transactionType('credit'))
+            accounts[i].avaliableBalance = accounts[i].avaliableBalance + transaction.amount;
+          if(accounts[i].avaliableBalance < 0)
+            currentFinanceSafe = false;
+        }
         break;
       }
     }
@@ -243,6 +258,15 @@ var findAccountPayCreditCart = function(accounts, cc, needPay, description) {
         payBy: account._id
       }));
 
+      cc.pendingTransactions.push(UtilCtrl.clone({
+        date: currentCalculatingDate,
+        amount: needPay,
+        category: 'Payment',
+        description: description,
+        type: UtilCtrl.transactionType('credit'),
+        payBy: cc._id
+      }));
+
       result.push({description: description, type: UtilCtrl.transactionType('credit'), 
             amount: needPay, payBy: {accountName: cc.accountName, _id: cc._id}});
       result.push({description: "Payment for "+ cc.accountName, type: UtilCtrl.transactionType('debit'), 
@@ -262,7 +286,7 @@ var payExtraForUtilRatio = function(cc, accounts) {
     // need to pay more for making balance on the statemnent lower
     needPay += (cc.balance - thresholdBalance);
   }
-  
+  cc.avaliableBalance = cc.avaliableBalance + needPay;
   cc.changed = addChanged(cc, UtilCtrl.transactionType('credit'), cc.changed, needPay);
   return findAccountPayCreditCart(accounts, cc, needPay, "Pay Extra For Util Ratio");
 }
@@ -282,6 +306,7 @@ var makeDueDatePayment = function(cc, accounts) {
     cc.lastBalance = 0;
     description = "Last Statment Payment";
   }
+  cc.avaliableBalance = cc.avaliableBalance + needPay;
   cc.changed = addChanged(cc, UtilCtrl.transactionType('credit'), cc.changed, needPay);
   return findAccountPayCreditCart(accounts, cc, needPay, description);
 }
@@ -341,7 +366,6 @@ var calculateBudget = function(startDate, endDate, latestAccountsInfo, transacti
   // initial data here and will return those back
   var statements = []; // properties: date, accountsDetails, transactions
   var events = []; // date and status
-  var financeDangerDateList = [];
   lowestBalanceAccounts = new Map(); // {_id, balance}
   currentFinanceSafe = true; // no negative balance on checking or saving account
 
@@ -352,11 +376,10 @@ var calculateBudget = function(startDate, endDate, latestAccountsInfo, transacti
   var latestAccountsInfoDate = UtilCtrl.dateValidator(latestAccountsInfo.date);
   // start date can not earlier than lastest accounts date
   if(startDate.diff(new Date(latestAccountsInfo.date), 'days') < 0)
-    return console.error("start date can not earlier than lastest accounts date");
+    return console.log("start date can not earlier than lastest accounts date");
   // end date can not earlier than lastest accounts date and start date
-  if(endDate.diff(new Date(latestAccountsInfo.date), 'days') < 0 || endDate.diff(new Date(startDate.date), 'days') < 0)
-    return console.error("end date can not earlier than lastest accounts date and start date");
-  
+  if(endDate.diff(new Date(latestAccountsInfo.date), 'days') < 0 || endDate.diff(new Date(startDate), 'days') < 0)
+    return console.log("end date can not earlier than lastest accounts date and start date");
   var duration = endDate.diff(latestAccountsInfoDate, 'days');
   currentCalculatingDate = UtilCtrl.clone(latestAccountsInfoDate);
   // the temp account for calculating
@@ -371,8 +394,6 @@ var calculateBudget = function(startDate, endDate, latestAccountsInfo, transacti
 
   // calculating statement each day
   for(var i = 0; i < duration; i++) {
-    if(!currentFinanceSafe)
-      break;
 
     currentCalculatingDate.add(1, 'days');
 
@@ -451,11 +472,13 @@ var calculateBudget = function(startDate, endDate, latestAccountsInfo, transacti
         financeStatus = "cal-finance-safe";
       } else {
         financeStatus = "cal-finance-warning";
-        financeDangerDateList.push(UtilCtrl.dateString(currentCalculatingDate, 1));
       }
       events.push({date: UtilCtrl.dateString(currentCalculatingDate, 1), financeStatus: financeStatus});
     }
     statements.push(UtilCtrl.clone(currentStatement));
+
+    if(!currentFinanceSafe)
+      break;
   }
 
   // convert map object to list for JSON transfering 
@@ -471,7 +494,7 @@ var calculateBudget = function(startDate, endDate, latestAccountsInfo, transacti
 
   var result = UtilCtrl.clone({
     events: events,
-    financeDangerDateList: financeDangerDateList,
+    currentFinanceSafe: UtilCtrl.clone(currentFinanceSafe),
     statements: statements,
     lowestBalanceInAccountList: lowestBalanceInAccountList
   });
@@ -485,7 +508,7 @@ var canHasTransaction = function(newTran, startDate, endDate, latestAccountsInfo
   var avaliableAccounts = [];
 
   latestAccountsInfo.accountsDetails.forEach(function(account){
-    if(account.type !== 'GiftCard'){
+    if(account.type !== UtilCtrl.accountType('gift')){
       var newTranTemp = UtilCtrl.clone(newTran);
       var latestAccountsInfoTemp = latestAccountsInfo;
       var transactionsTemp = UtilCtrl.clone(transactions);
@@ -497,7 +520,7 @@ var canHasTransaction = function(newTran, startDate, endDate, latestAccountsInfo
 
       var budgetResult = UtilCtrl.clone(calculateBudget(startDate, endDate, latestAccountsInfoTemp, transactionsTemp, recurringPaymentsTemp));
       
-      if(budgetResult.financeDangerDateList.length == 0) {
+      if(currentFinanceSafe) {
         avaliableAccounts.push(UtilCtrl.clone({
           // can use this account to pay this transaction
           avaliableAccount: account,
@@ -561,7 +584,7 @@ module.exports.canHasTransactionReq = function(req, res) {
   if(_.isNil(endDate))
     return console.error("End Date not defined");
   
-  endDate = UtilCtrl.getCurrentDate().add(endDate, 'month');
+  endDate = UtilCtrl.dateValidator(startDate).add(endDate, 'month');
   var transaction = {
     amount: amount,
     date: date,
@@ -602,13 +625,13 @@ module.exports.salaryNeedForPlan = function(req, res) {
     recurringPayments.push(payroll);
     var budgetResult = calculateBudget(startDate, endDate, latestAccountsInfo, transactions, recurringPayments);
     
-    if(budgetResult.financeDangerDateList.length == 0){
+    if(currentFinanceSafe){
       console.log("Don't need a job.")
       return res.status(200).send({msg: "Don't need a job..."});
     }
 
     // var max = 50;
-    // while(budgetResult.financeDangerDateList.length > 0 && max-- > 0 ) {
+    // while(currentFinanceSafe && max-- > 0 ) {
     //   payroll.amount = payroll.amount - budgetResult.lowestBalanceInAccountList[0].balance;
     //   var tempReucrringPayments = UtilCtrl.clone(resData[2]);
     //   tempReucrringPayments.push(payroll);

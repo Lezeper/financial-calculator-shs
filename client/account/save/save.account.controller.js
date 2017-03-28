@@ -35,7 +35,8 @@
                 "rewards": bool,
                 "rewardRules": bool,
                 "payBy": bool,
-                "backupPaymentAccount": bool
+                "backupPaymentAccount": bool,
+                "avaliableBalance": bool
             };
         }
 
